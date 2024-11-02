@@ -1,4 +1,4 @@
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageFilter
 import numpy as np
 import torch
 import requests
@@ -14,7 +14,8 @@ class MaskRenderPass:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "api_key": ("STRING", { "multiline": False })
+                "api_key": ("STRING", { "multiline": False }),
+                "blur_radius": ("FLOAT", { "default": 0.0, "min": 0.0, "max": 50.0 }),
             },
         }
 
@@ -24,8 +25,8 @@ class MaskRenderPass:
         m = hashlib.sha256().update(str(time.time()).encode("utf-8"))
         return m.digest().hex()
 
-    RETURN_TYPES = ("IMAGE", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING")
-    RETURN_NAMES = ("Image", "Color 1", "Color 2", "Color 3", "Color 4", "Color 5", "Color 6", "Color 7", "Color 8")
+    RETURN_TYPES = ("IMAGE",) + ("IMAGE",) * 8
+    RETURN_NAMES = ("Composite Mask", "Mask 1", "Mask 2", "Mask 3", "Mask 4", "Mask 5", "Mask 6", "Mask 7", "Mask 8")
 
     FUNCTION = "parse_mask"
 
@@ -33,7 +34,7 @@ class MaskRenderPass:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_mask(self, api_key):
+    def parse_mask(self, api_key, blur_radius):
         base_url = "https://accounts.playbookengine.com"
         user_token = None
 
@@ -55,9 +56,31 @@ class MaskRenderPass:
                 image = Image.open(BytesIO(mask_response.content))
                 image = ImageOps.exif_transpose(image)
                 image = image.convert("RGB")
-                image = np.array(image).astype(np.float32) / 255.0
-                image = torch.from_numpy(image)[None,]
-                return [image, "#ffe906", "#0589d6", "#a2d4d5", "#000016", "#00ad58", "#f084cf", "#ee9e3e", "#e6000c"]
+                composite_mask = np.array(image).astype(np.float32) / 255.0
+                composite_mask_tensor = torch.from_numpy(composite_mask)[None,]
+                # Color codes
+                color_codes = ["#ffe906", "#0589d6", "#a2d4d5", "#000016", "#00ad58", "#f084cf", "#ee9e3e", "#e6000c"]
+                color_tuples = [tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) for color in color_codes]
+
+                # Create individual masks
+                individual_masks = []
+                for color in color_tuples:
+                    # Create a binary mask for the current color
+                    mask_array = ((composite_mask == np.array(color)/255.0).all(axis=2)).astype(np.uint8) * 255
+                    mask_image = Image.fromarray(mask_array, mode='L')
+                    # Apply blur if blur_radius > 0
+                    if blur_radius > 0:
+                        mask_image = mask_image.filter(ImageFilter.GaussianBlur(radius=blur_radius))
+                    # Convert back to tensor
+                    mask_tensor = torch.from_numpy(np.array(mask_image).astype(np.float32) / 255.0)[None,]
+                    individual_masks.append(mask_tensor)
+
+                # Ensure all masks have the same size
+                for i in range(len(individual_masks)):
+                    if individual_masks[i].shape != individual_masks[0].shape:
+                        individual_masks[i] = torch.nn.functional.interpolate(individual_masks[i], size=individual_masks[0].shape[2:], mode='nearest')
+
+                return [composite_mask_tensor] + individual_masks
         except Exception:
             raise ValueError("Mask pass not uploaded")
 
