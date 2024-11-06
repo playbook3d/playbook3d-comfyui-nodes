@@ -26,4 +26,4 @@ class PlaybookText:
         return [text]
     
 NODE_CLASS_MAPPINGS = { "Playbook Text": PlaybookText}
-NODE_DISPLAY_NAME_MAPPINGS = { "Playbook Text": "Playbook Text"}
+NODE_DISPLAY_NAME_MAPPINGS = { "Playbook Text": "Playbook Text (External)"}
