@@ -28,9 +28,9 @@ class PlaybookImage:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_image(self, name = None):
+    def parse_image(self, name = None, playbook_image = None):
         image_url = name
-        image = None
+        image = playbook_image
         try:
             if name.startswith('http'):
                 image_request = requests.get(image_url)
@@ -45,7 +45,7 @@ class PlaybookImage:
             return [ image ]
         except Exception as e:
             print(f"Exception while downloading Image {e}")
-            return [ None ]
+            return [ image ]
             
         
 
