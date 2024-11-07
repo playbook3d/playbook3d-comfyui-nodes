@@ -21,7 +21,7 @@ class PlaybookText:
 
     OUTPUT_NODE = { False }
 
-    CATEGORY = "Playbook3 d"
+    CATEGORY = "Playbook 3D"
 
     def parse_text(self, text = None, trigger_words = None):
         return [text, trigger_words]
