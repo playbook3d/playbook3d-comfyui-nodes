@@ -3,8 +3,6 @@ import numpy as np
 import torch
 import requests
 from io import BytesIO
-import hashlib
-import time
 
 class PlaybookImage:
     def __init__(self):
@@ -14,7 +12,7 @@ class PlaybookImage:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "id": ("STRING", { "multiline": False })
+                "name": ("STRING", { "multiline": False })
             },
             "optional": {
                 "playbook_image": ("IMAGE",)
@@ -30,11 +28,11 @@ class PlaybookImage:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_image(self, id = None):
-        image_url = id
+    def parse_image(self, name = None):
+        image_url = name
         image = None
         try:
-            if id.startswith('http'):
+            if name.startswith('http'):
                 image_request = requests.get(image_url)
                 image = Image.open(BytesIO(image_request.content))
             else:

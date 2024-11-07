@@ -6,7 +6,7 @@ class PlaybookText:
     def INPUT_TYPES(s):
         return{
             "required": {
-                "id": ("STRING", { "multiline": False, "default": "Playbook Text ID"},),
+                "name": ("STRING", { "multiline": False, "default": "Playbook Text ID"},),
             },
             "optional": {
                 "text": ("STRING", {"multiline": True},),

@@ -6,7 +6,7 @@ class PlaybookNumber:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "id": ("STRING", {"multiline": False, "default": "Playbook Number ID"} )
+                "name": ("STRING", {"multiline": False, "default": "Playbook Number ID"} )
             },
             "optional": {
                 "playbook_number": ("INT",
@@ -30,10 +30,10 @@ class PlaybookNumber:
 
     CATEGORY = { "Playbook 3D" }
 
-    def parse_number(self, id,  playbook_number = None):
-        if not id or (isinstance(id, str) and not id.strip().isdigit()):
+    def parse_number(self, name,  playbook_number = None):
+        if not name or (isinstance(id, str) and not name.strip().isdigit()):
             return [playbook_number]
-        return [int(id)]
+        return [int(name)]
 
 
 NODE_CLASS_MAPPINGS = { "Playbook Number": PlaybookNumber }

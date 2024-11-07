@@ -6,7 +6,7 @@ class PlaybookBoolean:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "id": ("STRING", {"multiline": False, "default": "Playbook Boolean ID"}),
+                "name": ("STRING", {"multiline": False, "default": "Playbook Boolean ID"}),
                 "playbook_bool": ("BOOLEAN",{"default": False})
             },
         }
@@ -20,7 +20,7 @@ class PlaybookBoolean:
 
     CATEGORY = { "Playbook 3D" }
 
-    def parse_boolean(self, id,  playbook_bool = None):
+    def parse_boolean(self, name,  playbook_bool = None):
         return [playbook_bool]
 
 
