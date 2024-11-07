@@ -21,17 +21,17 @@ class PlaybookNumber:
             }
         }
 
-    RETURN_TYPES = { "INT", }
-    RETURN_NAMES = { "Int", }
+    RETURN_TYPES = ("INT",)
+    RETURN_NAMES = ("Int",)
 
     FUNCTION = "parse_number"
 
-    OUTPUT_NODE = {}
+    OUTPUT_NODE = { False }
 
-    CATEGORY = { "Playbook 3D" }
+    CATEGORY = "Playbook 3D"
 
     def parse_number(self, name,  playbook_number = None):
-        if not name or (isinstance(id, str) and not name.strip().isdigit()):
+        if not name or (isinstance(name, str) and not name.strip().isdigit()):
             return [playbook_number]
         return [int(name)]
 

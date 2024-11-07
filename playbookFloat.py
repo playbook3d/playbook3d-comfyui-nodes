@@ -22,18 +22,18 @@ class PlaybookFloat:
             }
         }
 
-    RETURN_TYPES = { "FLOAT", }
-    RETURN_NAMES = { "Float", }
+    RETURN_TYPES = ("FLOAT",)
+    RETURN_NAMES = ("Float",)
 
     FUNCTION = "parse_float"
 
-    OUTPUT_NODE = {}
+    OUTPUT_NODE = { False }
 
-    CATEGORY = { "Playbook 3D" }
+    CATEGORY = "Playbook 3D"
 
-    def parse_float(self, name,  playbook_number = None):
+    def parse_float(self, name,  playbook_float = None):
         if not name or (isinstance(name, str) and not name.strip().isdigit()):
-            return [playbook_number]
+            return [playbook_float]
         return [float(name)]
 
 

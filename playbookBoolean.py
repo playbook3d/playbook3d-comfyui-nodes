@@ -7,18 +7,18 @@ class PlaybookBoolean:
         return {
             "required": {
                 "name": ("STRING", {"multiline": False, "default": "Playbook Boolean ID"}),
-                "playbook_bool": ("BOOLEAN",{"default": False})
+                "playbook_bool": ("BOOLEAN", {"default": False})
             },
         }
 
-    RETURN_TYPES = { "BOOLEAN", }
-    RETURN_NAMES = { "Boolean", }
+    RETURN_TYPES = ( "BOOLEAN", )
+    RETURN_NAMES = ("Boolean", )
 
     FUNCTION = "parse_boolean"
 
-    OUTPUT_NODE = {}
+    OUTPUT_NODE = { False }
 
-    CATEGORY = { "Playbook 3D" }
+    CATEGORY = "Playbook 3D"
 
     def parse_boolean(self, name,  playbook_bool = None):
         return [playbook_bool]
