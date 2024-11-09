@@ -13,8 +13,8 @@ class UploadRenderResult:
             },
         }
 
-    RETURN_TYPES = ()
-    RETURN_NAMES = ()
+    RETURN_TYPES = ("STRING")
+    RETURN_NAMES = ("URL")
 
     FUNCTION = "parse_result"
 
@@ -40,7 +40,7 @@ class UploadRenderResult:
             if result_request.status_code == 200:
                 result_url = result_request.json()["result"]
                 result_response = requests.put(url=result_url, files=image)
-                return result_response
+                return [result_url]
         except Exception:
             raise ValueError("Error with uploading Result")
 
