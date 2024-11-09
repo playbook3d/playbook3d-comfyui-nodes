@@ -13,8 +13,8 @@ class UploadRenderResult:
             },
         }
 
-    RETURN_TYPES = ("STRING")
-    RETURN_NAMES = ("URL")
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("URL",)
 
     FUNCTION = "parse_result"
 
