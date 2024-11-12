@@ -38,9 +38,12 @@ class UploadRenderResult:
             headers = {"Authorization": f"Bearer {user_token}"}
             result_request = requests.get(f"{base_url}/upload-assets/get-upload-urls", headers=headers)
             if result_request.status_code == 200:
-                result_url = result_request.json()["result"]
+                result_url = result_request.json()["save_result"]
                 result_response = requests.put(url=result_url, files=image)
-                return [result_url]
+                if result_response.status_code == 200:
+                    download_request = requests.get(f"{base_url}/download-assets/get-download-urls", headers=headers)
+                    download_url = download_request.json()["save_result"]
+                    return [download_url]
         except Exception:
             raise ValueError("Error with uploading Result")
 
