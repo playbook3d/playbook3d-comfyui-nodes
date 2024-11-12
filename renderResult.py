@@ -1,4 +1,6 @@
 import requests
+import numpy as np
+from PIL import Image, ImageOps
 
 class UploadRenderResult:
     def __init__(self):
@@ -23,6 +25,9 @@ class UploadRenderResult:
     CATEGORY = "Playbook 3D"
 
     def parse_result(self, api_key, image):
+
+        internal_img = 255 * image.cpu().numpy()
+        img = Image.fromarray(np.clip(internal_img, 0, 255).astype(np.uint8))
         base_url = "https://accounts.playbookengine.com"
         user_token = None
         jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
@@ -40,7 +45,7 @@ class UploadRenderResult:
             if result_request.status_code == 200:
                 print(result_request.json())
                 result_url = result_request.json()["save_result"]
-                result_response = requests.put(url=result_url, files=image)
+                result_response = requests.put(url=result_url, files=img)
                 print(result_response)
                 if result_response.status_code == 200:
                     download_request = requests.get(f"{base_url}/download-assets/get-download-urls", headers=headers)
