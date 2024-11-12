@@ -38,10 +38,13 @@ class UploadRenderResult:
             headers = {"Authorization": f"Bearer {user_token}"}
             result_request = requests.get(f"{base_url}/upload-assets/get-upload-urls", headers=headers)
             if result_request.status_code == 200:
+                print(result_request.json())
                 result_url = result_request.json()["save_result"]
                 result_response = requests.put(url=result_url, files=image)
+                print(result_response)
                 if result_response.status_code == 200:
                     download_request = requests.get(f"{base_url}/download-assets/get-download-urls", headers=headers)
+                    print(download_request.json())
                     download_url = download_request.json()["save_result"]
                     return [download_url]
         except Exception:
