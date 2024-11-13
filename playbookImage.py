@@ -12,8 +12,8 @@ class PlaybookImage:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "id": ("STRING", { "multiline": False }),
-                "label": ("STRING", { "multiline": False })
+                "id": ("STRING", {"multiline": False, "default": "Node ID"}),
+                "label": ("STRING", {"multiline": False, "default": "Node Label"}),
             },
             "optional": {
                 "default_value": ("IMAGE",)
