@@ -1,3 +1,5 @@
+import numpy as np
+
 class PlaybookFloat:
     def __init__(self):
         pass
@@ -8,14 +10,16 @@ class PlaybookFloat:
             "required": {
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
+                "min": ("FLOAT", {"multiline": False, "default": "Min"}),
+                "max": ("FLOAT", {"multiline": False, "default": "Max"}),
             },
             "optional": {
                 "default_value": ("FLOAT",
                     {
                         "multiline": True, 
                         "display": "number", 
-                        "min": -1.0,
-                        "max": 1.0,
+                        "min": -2147483647,
+                        "max": 2147483647,
                         "default": 0,
                         "step": 0.1
                     },
@@ -32,11 +36,11 @@ class PlaybookFloat:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_float(self, id, label, default_value = None):
+    def parse_float(self, id, label, min, max, default_value = None):
         if not id or (isinstance(id, str) and not id.strip().isdigit()):
-            return [default_value]
-        return [float(id)]
-
+            return [np.clip(default_value, min, max)]
+        float_id = float(id)
+        return [np.clip(float_id, min, max)]
 
 NODE_CLASS_MAPPINGS = { "Playbook Float": PlaybookFloat }
 

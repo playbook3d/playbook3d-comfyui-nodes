@@ -1,3 +1,5 @@
+import numpy as np
+
 class PlaybookNumber:
     def __init__(self):
         pass
@@ -8,14 +10,16 @@ class PlaybookNumber:
             "required": {
                 "id": ("STRING", {"multiline": False, "default": "Node ID"} ),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"} ),
+                "min": ("INT", {"multiline": False, "default": "Min"} ),
+                "max": ("INT", {"multiline": False, "default": "Max"} ),
             },
             "optional": {
                 "default_value": ("INT",
                     {
                         "multiline": True, 
                         "display": "number", 
-                        "min": -100,
-                        "max": 100,
+                        "min": -2147483647,
+                        "max": 2147483647,
                         "default": 0
                     },
                 ),
@@ -31,10 +35,11 @@ class PlaybookNumber:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_number(self, id, label, default_value = None):
+    def parse_number(self, id, min, max, label, default_value = None):
         if not id or (isinstance(id, str) and not id.strip().isdigit()):
-            return [default_value]
-        return [int(id)]
+            return [np.clip(default_value, min, max)]
+        id_int = int(id)
+        return [np.clip(id_int, min, max)]
 
 
 NODE_CLASS_MAPPINGS = { "Playbook Number": PlaybookNumber }
