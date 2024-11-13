@@ -14,10 +14,10 @@ class PlaybookFloat:
                     {
                         "multiline": True, 
                         "display": "number", 
-                        "min": -2147483647, 
-                        "max": 2147483647, 
+                        "min": -1.0,
+                        "max": 1.0,
                         "default": 0,
-                        "step": 0.01
+                        "step": 0.1
                     },
                 ),
             }
