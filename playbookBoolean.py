@@ -6,8 +6,9 @@ class PlaybookBoolean:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "name": ("STRING", {"multiline": False, "default": "Playbook Boolean ID"}),
-                "playbook_bool": ("BOOLEAN", {"default": False})
+                "id": ("STRING", {"multiline": False, "default": "Node ID"}),
+                "label": ("STRING", {"multiline": False, "default": "Node Label"}),
+                "default_value": ("BOOLEAN", {"default": False})
             },
         }
 
@@ -20,8 +21,8 @@ class PlaybookBoolean:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_boolean(self, name,  playbook_bool = None):
-        return [playbook_bool]
+    def parse_boolean(self, id, label, default_value):
+        return [default_value]
 
 
 NODE_CLASS_MAPPINGS = { "Playbook Boolean": PlaybookBoolean }
