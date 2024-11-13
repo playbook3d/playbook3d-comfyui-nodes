@@ -12,10 +12,11 @@ class PlaybookImage:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "name": ("STRING", { "multiline": False })
+                "id": ("STRING", { "multiline": False }),
+                "label": ("STRING", { "multiline": False })
             },
             "optional": {
-                "playbook_image": ("IMAGE",)
+                "default_value": ("IMAGE",)
             },
         }
 
@@ -28,11 +29,11 @@ class PlaybookImage:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_image(self, name = None, playbook_image = None):
-        image_url = name
-        image = playbook_image
+    def parse_image(self, id , label , default_value = None):
+        image_url = id
+        image = default_value
         try:
-            if name.startswith('http'):
+            if id.startswith('http'):
                 image_request = requests.get(image_url)
                 image = Image.open(BytesIO(image_request.content))
             else:
