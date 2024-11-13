@@ -24,7 +24,7 @@ class PlaybookText:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_text(self, id, default_value = None, trigger_words = None):
+    def parse_text(self, id, label, default_value = None, trigger_words = None):
         return [default_value, trigger_words]
     
 NODE_CLASS_MAPPINGS = { "Playbook Text": PlaybookText}
