@@ -6,10 +6,11 @@ class PlaybookText:
     def INPUT_TYPES(s):
         return{
             "required": {
-                "name": ("STRING", { "multiline": False, "default": "Playbook Text ID"},),
+                "id": ("STRING", { "multiline": False, "default": "Node ID"},),
+                "label": ("STRING", { "multiline": False, "default": "Node Label"},),
             },
             "optional": {
-                "text": ("STRING", {"multiline": True},),
+                "default_value": ("STRING", {"multiline": True},),
                 "trigger_words": ("STRING", {"multiline": True})
             }
         }
@@ -23,8 +24,8 @@ class PlaybookText:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_text(self, name, text = None, trigger_words = None):
-        return [text, trigger_words]
+    def parse_text(self, id, default_value = None, trigger_words = None):
+        return [default_value, trigger_words]
     
 NODE_CLASS_MAPPINGS = { "Playbook Text": PlaybookText}
 NODE_DISPLAY_NAME_MAPPINGS = { "Playbook Text": "Playbook Text (External)"}
