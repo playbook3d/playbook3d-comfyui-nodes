@@ -6,10 +6,11 @@ class PlaybookFloat:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "name": ("STRING", {"multiline": False, "default": "Playbook Float ID"})
+                "id": ("STRING", {"multiline": False, "default": "Node ID"}),
+                "label": ("STRING", {"multiline": False, "default": "Node Label"}),
             },
             "optional": {
-                "playbook_float": ("FLOAT",
+                "default_value": ("FLOAT",
                     {
                         "multiline": True, 
                         "display": "number", 
@@ -31,10 +32,10 @@ class PlaybookFloat:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_float(self, name,  playbook_float = None):
-        if not name or (isinstance(name, str) and not name.strip().isdigit()):
-            return [playbook_float]
-        return [float(name)]
+    def parse_float(self, id, label, default_value = None):
+        if not id or (isinstance(id, str) and not id.strip().isdigit()):
+            return [default_value]
+        return [float(id)]
 
 
 NODE_CLASS_MAPPINGS = { "Playbook Float": PlaybookFloat }
