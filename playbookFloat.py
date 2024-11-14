@@ -10,8 +10,8 @@ class PlaybookFloat:
             "required": {
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
-                "min": ("FLOAT", {"multiline": False, "default": "Min"}),
-                "max": ("FLOAT", {"multiline": False, "default": "Max"}),
+                "min_float": ("FLOAT", {"multiline": False, "default": "Min"}),
+                "max_float": ("FLOAT", {"multiline": False, "default": "Max"}),
             },
             "optional": {
                 "default_value": ("FLOAT",
@@ -36,11 +36,12 @@ class PlaybookFloat:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_float(self, id, label, min, max, default_value = None):
+    def parse_float(self, id, label, min_float, max_float, default_value = None):
         if not id or (isinstance(id, str) and not id.strip().isdigit()):
-            return [np.clip(default_value, min, max)]
-        float_id = float(id)
-        return [np.clip(float_id, min, max)]
+            clamped_float = np.clip(default_value, min_float, max_float)
+            return [clamped_float]
+        clamped_float_id = np.clip(float(id), min_float, max_float)
+        return [clamped_float_id]
 
 NODE_CLASS_MAPPINGS = { "Playbook Float": PlaybookFloat }
 
