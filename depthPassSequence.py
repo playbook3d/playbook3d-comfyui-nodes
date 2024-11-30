@@ -52,22 +52,26 @@ class DepthRenderPassSequence:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
+            depth_request = requests.get(f"{base_url}/upload-assets/get-download-urls", headers=headers)
+            if depth_request.status_code == 200:
+                depth_url = depth_request.json()["depth_zip"]
 
-            # this is supposed to be placed by the actual endpoint
-            zip_url = "https://drive.google.com/uc?export=download&id=1Pz1WuowO_pPZyziyoGyYtGY3WfWKdBrN"
+                # Download the zip file
+                depth_response = requests.get(depth_url)
+                if depth_response.status_code != 200:
+                    raise ValueError("Failed to download the depth zip file.")
 
-            # this downloads the zip file
-            response = requests.get(zip_url)
-            if response.status_code != 200:
-                raise ValueError("Failed to download the zip file.")
+                zip_content = depth_response.content
 
-            # this extracts the images from the zip file
-            images_batch = self.extract_images_from_zip(response.content)
+                # Extract images from the zip file
+                images_batch = self.extract_images_from_zip(zip_content)
 
-            return (images_batch,)
+                return (images_batch,)
+            else:
+                raise ValueError("Failed to retrieve depth URL.")
         except Exception as e:
             print(f"Error processing depth sequence: {e}")
-            raise ValueError("Error processing depth sequence.")
+            raise ValueError("Depth pass not uploaded or processing error occurred.")
 
     def extract_images_from_zip(self, zip_content):
         images = []
@@ -77,10 +81,9 @@ class DepthRenderPassSequence:
                 f.write(zip_content)
 
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                # this sorts the file names in ascending order
+                # Sort the file names in ascending order
                 image_files = sorted([f for f in zip_ref.namelist() if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
                 for file_name in image_files:
-                    # depth pass
                     with zip_ref.open(file_name) as img_file:
                         image = Image.open(BytesIO(img_file.read()))
                         image = ImageOps.exif_transpose(image)
@@ -90,7 +93,6 @@ class DepthRenderPassSequence:
                         images.append(image)
 
         if images:
-            # this stacks the images into a batch tensor
             images_batch = torch.cat(images, dim=0)
             return images_batch
         else:

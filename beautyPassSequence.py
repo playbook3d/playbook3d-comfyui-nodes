@@ -39,7 +39,6 @@ class BeautyRenderPassSequence:
         base_url = "https://accounts.playbookengine.com"
         user_token = None
 
-
         jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
         try:
             if jwt_request is not None and jwt_request.status_code == 200:
@@ -52,21 +51,26 @@ class BeautyRenderPassSequence:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            # this is supposed to be placed by the actual endpoint
-            zip_url = "https://drive.google.com/uc?export=download&id=1Q_eGbf78oVx4XORhuSJA6aYffimB_c-V"
+            beauty_request = requests.get(f"{base_url}/upload-assets/get-download-urls", headers=headers)
+            if beauty_request.status_code == 200:
+                beauty_url = beauty_request.json()["beauty_zip"]
 
-            # this downloads the zip file
-            response = requests.get(zip_url)
-            if response.status_code != 200:
-                raise ValueError("Failed to download the zip file.")
+                # Download the zip file
+                beauty_response = requests.get(beauty_url)
+                if beauty_response.status_code != 200:
+                    raise ValueError("Failed to download the beauty zip file.")
 
-            # this extracts the images from the zip file
-            images_batch = self.extract_images_from_zip(response.content)
+                zip_content = beauty_response.content
 
-            return (images_batch,)
+                # Extract images from the zip file
+                images_batch = self.extract_images_from_zip(zip_content)
+
+                return (images_batch,)
+            else:
+                raise ValueError("Failed to retrieve beauty URL.")
         except Exception as e:
             print(f"Error processing beauty sequence: {e}")
-            raise ValueError("Error processing beauty sequence.")
+            raise ValueError("Beauty pass not uploaded or processing error occurred.")
 
     def extract_images_from_zip(self, zip_content):
         images = []
@@ -79,7 +83,6 @@ class BeautyRenderPassSequence:
                 # Get a list of image file names, sorted in ascending order
                 image_files = sorted([f for f in zip_ref.namelist() if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
                 for file_name in image_files:
-                    # Read image data from the zip file
                     with zip_ref.open(file_name) as img_file:
                         image = Image.open(BytesIO(img_file.read()))
                         image = ImageOps.exif_transpose(image)

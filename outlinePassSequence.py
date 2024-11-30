@@ -52,24 +52,26 @@ class OutlineRenderPassSequence:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
+            outline_request = requests.get(f"{base_url}/upload-assets/get-download-urls", headers=headers)
+            if outline_request.status_code == 200:
+                outline_url = outline_request.json()["outline_zip"]
 
-            # this is supposed to be placed by the actual endpoint
-            zip_url = "https://drive.google.com/uc?export=download&id=1CyH5MlX5OQrxZYwgITKwvzPkRcnJjR9N"
+                # Download the zip file
+                outline_response = requests.get(outline_url)
+                if outline_response.status_code != 200:
+                    raise ValueError("Failed to download the outline zip file.")
 
+                zip_content = outline_response.content
 
-            # this downloads the zip file
-            response = requests.get(zip_url)
-            if response.status_code != 200:
-                raise ValueError("Failed to download the zip file.")
-            zip_content = response.content
+                # Extract images from the zip file
+                images_batch = self.extract_images_from_zip(zip_content)
 
-            # this extracts the images from the zip file
-            images_batch = self.extract_images_from_zip(zip_content)
-
-            return (images_batch,)
+                return (images_batch,)
+            else:
+                raise ValueError("Failed to retrieve outline URL.")
         except Exception as e:
             print(f"Error processing outline sequence: {e}")
-            raise ValueError("Error processing outline sequence.")
+            raise ValueError("Outline pass not uploaded or processing error occurred.")
 
     def extract_images_from_zip(self, zip_content):
         images = []
@@ -79,10 +81,9 @@ class OutlineRenderPassSequence:
                 f.write(zip_content)
 
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                # this sorts the images in ascending order based on file names
+                # Sort the images in ascending order based on file names
                 image_files = sorted([f for f in zip_ref.namelist() if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
                 for file_name in image_files:
-                    # Outline pass
                     with zip_ref.open(file_name) as img_file:
                         image = Image.open(BytesIO(img_file.read()))
                         image = ImageOps.exif_transpose(image)
@@ -92,7 +93,6 @@ class OutlineRenderPassSequence:
                         images.append(image)
 
         if images:
-            # this stacks the images into a batch tensor
             images_batch = torch.cat(images, dim=0)
             return images_batch
         else:
