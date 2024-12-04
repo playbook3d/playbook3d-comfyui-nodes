@@ -8,6 +8,9 @@ from .playbookFloat import PlaybookFloat
 from .playbookNumber import PlaybookNumber
 from .playbookText import PlaybookText
 from .playbookImage import PlaybookImage
+from .playbookVideo import PlaybookVideo
+from .saveVideoFrames import SaveVideoFrames
+
 
 NODE_CLASS_MAPPINGS = {
     "Playbook Depth": DepthRenderPass,
@@ -19,7 +22,9 @@ NODE_CLASS_MAPPINGS = {
     "Playbook Float": PlaybookFloat,
     "Playbook Number": PlaybookNumber,
     "Playbook Text": PlaybookText,
-    "Playbook Image": PlaybookImage
+    "Playbook Image": PlaybookImage,
+    "Playbook Video": PlaybookVideo,
+    "Playbook Save Frames": SaveVideoFrames
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -32,7 +37,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Playbook Float": "Playbook Float (External)",
     "Playbook Number": "Playbook Number (External)",
     "Playbook Text": "Playbook Text (External)",
-    "Playbook Image": "Playbook Image (External)"
+    "Playbook Image": "Playbook Image (External)",
+    "Playbook Video": "Playbook Video (External)",
+    "Playbook Save Frames": "Playbook Select Video Frame",
 }
 
 
