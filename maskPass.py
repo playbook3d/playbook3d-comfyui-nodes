@@ -12,30 +12,75 @@ class MaskRenderPass:
 
     @classmethod
     def INPUT_TYPES(s):
+        
         return {
             "required": {
                 "api_key": ("STRING", { "multiline": False }),
-                "blur_radius": ("FLOAT", { "default": 0.0, "min": 0.0, "max": 50.0 }),
+                "id": ("STRING", { "multiline": False }),
+                "label": ("STRING", { "multiline": False }),
+                "blur_size": ("FLOAT", { "default": 0.0, "min": 0.0, "max": 50.0 }),
+                "default_value": ("IMAGE",),
+                "mask_1_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_2_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_3_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_4_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_5_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_6_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_7_prompt_default_value": ("STRING", { "multiline": True }),
             },
         }
 
     @classmethod
     def IS_CHANGED(s, image):
-        # always update
+        # Always update
         m = hashlib.sha256()
         m.update(str(time.time()).encode("utf-8"))
         return m.digest().hex()
 
-    RETURN_TYPES = ("IMAGE",) + ("IMAGE",) * 8
-    RETURN_NAMES = ("Composite Mask", "Mask 1", "Mask 2", "Mask 3", "Mask 4", "Mask 5", "Mask 6", "Mask 7", "Mask 8")
+    RETURN_TYPES = (
+        "IMAGE",
+        "MASK", "STRING",
+        "MASK", "STRING",
+        "MASK", "STRING",
+        "MASK", "STRING",
+        "MASK", "STRING",
+        "MASK", "STRING",
+        "MASK", "STRING",
+        "MASK"
+    )
+
+    RETURN_NAMES = (
+        "image",
+        "mask_1", "mask_1_prompt",
+        "mask_2", "mask_2_prompt",
+        "mask_3", "mask_3_prompt",
+        "mask_4", "mask_4_prompt",
+        "mask_5", "mask_5_prompt",
+        "mask_6", "mask_6_prompt",
+        "mask_7", "mask_7_prompt",
+        "mask_8"
+    )
 
     FUNCTION = "parse_mask"
 
-    OUTPUT_NODE = { False }
-
+    OUTPUT_NODE = {False}
     CATEGORY = "Playbook 3D"
 
-    def parse_mask(self, api_key, blur_radius):
+    def parse_mask(
+        self,
+        api_key,
+        id,
+        label,
+        blur_size,
+        default_value,
+        mask_1_prompt_default_value,
+        mask_2_prompt_default_value,
+        mask_3_prompt_default_value,
+        mask_4_prompt_default_value,
+        mask_5_prompt_default_value,
+        mask_6_prompt_default_value,
+        mask_7_prompt_default_value
+    ):
         base_url = "https://accounts.playbookengine.com"
         user_token = None
 
@@ -57,45 +102,59 @@ class MaskRenderPass:
                 image = Image.open(BytesIO(mask_response.content))
                 image = ImageOps.exif_transpose(image)
                 image = image.convert("RGB")
-                # Load the image without normalizing to [0,1]
-                composite_mask = np.array(image)  # Now values are integers in [0, 255]
 
-                # Convert composite_mask to tensor normalized to [0,1]
+                # this creates a composite mask as a tensor
+                composite_mask = np.array(image)
                 composite_mask_tensor = torch.from_numpy(composite_mask.astype(np.float32) / 255.0)[None,]
 
-                # Color codes
-                color_codes = ["#ffe906", "#0589d6", "#a2d4d5", "#000016", "#00ad58", "#f084cf", "#ee9e3e", "#e6000c"]
+                color_codes = [
+                    "#ffe906",
+                    "#0589d6",
+                    "#a2d4d5",
+                    "#000016",
+                    "#00ad58",
+                    "#f084cf",
+                    "#ee9e3e",
+                    "#e6000c"
+                ]
                 color_tuples = [tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) for color in color_codes]
 
-                # Create individual masks
                 individual_masks = []
                 for color in color_tuples:
-                    # Create a binary mask for the current color
                     mask_array = ((composite_mask == np.array(color)).all(axis=2)).astype(np.uint8) * 255
                     mask_image = Image.fromarray(mask_array, mode='L')
-                    # Apply blur if blur_radius > 0
-                    if blur_radius > 0:
-                        mask_image = mask_image.filter(ImageFilter.GaussianBlur(radius=blur_radius))
-                    # Convert back to tensor and normalize to [0,1]
+                    # blur application if input is greater than 0
+                    if blur_size > 0:
+                        mask_image = mask_image.filter(ImageFilter.GaussianBlur(radius=blur_size))
+
                     mask_tensor = torch.from_numpy(np.array(mask_image).astype(np.float32) / 255.0)[None,]
                     individual_masks.append(mask_tensor)
 
-                # Ensure all masks have the same size
                 for i in range(len(individual_masks)):
                     if individual_masks[i].shape != individual_masks[0].shape:
                         individual_masks[i] = torch.nn.functional.interpolate(
                             individual_masks[i], size=individual_masks[0].shape[2:], mode='nearest'
                         )
+                print(mask_1_prompt_default_value)
+                print(mask_2_prompt_default_value)
 
-                return [composite_mask_tensor] + individual_masks
+                return [
+                    composite_mask_tensor,
+                    individual_masks[0], mask_1_prompt_default_value,
+                    individual_masks[1], mask_2_prompt_default_value,
+                    individual_masks[2], mask_3_prompt_default_value,
+                    individual_masks[3], mask_4_prompt_default_value,
+                    individual_masks[4], mask_5_prompt_default_value,
+                    individual_masks[5], mask_6_prompt_default_value,
+                    individual_masks[6], mask_7_prompt_default_value,
+                    individual_masks[7]
+                ]
+
             else:
                 raise ValueError("Failed to retrieve mask URL.")
         except Exception as e:
             print(f"Error while processing masks: {e}")
             raise ValueError("Mask pass not uploaded or processing error occurred.")
-
-
-
 
 NODE_CLASS_MAPPINGS = {
     "Playbook Mask": MaskRenderPass
@@ -104,3 +163,5 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Playbook Mask": "Playbook Mask Render Passes"
 }
+
+
