@@ -14,7 +14,8 @@ class DepthRenderPass:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "api_key": ("STRING", { "multiline": False })
+                "api_key": ("STRING", { "multiline": False }),
+                "default_value": ("IMAGE",)
             },
         }
 
@@ -35,7 +36,7 @@ class DepthRenderPass:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_depth(self, api_key):
+    def parse_depth(self, api_key, default_value):
         base_url = "https://accounts.playbookengine.com"
         user_token = None
 
@@ -46,7 +47,7 @@ class DepthRenderPass:
                 user_token = jwt_request.json()["access_token"]
         except Exception as e:
             print(f"Error with node: {e}")
-            raise ValueError("API Key not found/Incorrect")
+            return [default_value]
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
@@ -60,8 +61,10 @@ class DepthRenderPass:
                 image = np.array(image).astype(np.float32) / 255.0
                 image = torch.from_numpy(image)[None,]
                 return [image]
+            else:
+                return [default_value]
         except Exception:
-            raise ValueError("Depth not uploaded")
+            return [default_value]
         
 
 
