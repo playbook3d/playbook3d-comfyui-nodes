@@ -12,6 +12,7 @@ from .beautyPassSequence import BeautyRenderPassSequence
 from .depthPassSequence import DepthRenderPassSequence
 from .maskPassSequence import MaskRenderPassSequence
 from .outlinePassSequence import OutlineRenderPassSequence
+from .playbookVideo import PlaybookVideo
 
 NODE_CLASS_MAPPINGS = {
     "Playbook Depth": DepthRenderPass,
@@ -27,7 +28,8 @@ NODE_CLASS_MAPPINGS = {
     "Playbook Float": PlaybookFloat,
     "Playbook Number": PlaybookNumber,
     "Playbook Text": PlaybookText,
-    "Playbook Image": PlaybookImage
+    "Playbook Image": PlaybookImage,
+    "Playbook Video": PlaybookVideo,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -44,7 +46,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Playbook Float": "Playbook Float (External)",
     "Playbook Number": "Playbook Number (External)",
     "Playbook Text": "Playbook Text (External)",
-    "Playbook Image": "Playbook Image (External)"
+    "Playbook Image": "Playbook Image (External)",
+    "Playbook Video": "Playbook Video (External)",
 }
 
 
