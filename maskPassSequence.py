@@ -21,13 +21,6 @@ class MaskRenderPassSequence:
                 "id": ("STRING", {"multiline": False}),
                 "label": ("STRING", {"multiline": False}),
                 "blur_size": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 50.0}),
-                "mask_1_prompt_default_value": ("STRING", {"multiline": True}),
-                "mask_2_prompt_default_value": ("STRING", {"multiline": True}),
-                "mask_3_prompt_default_value": ("STRING", {"multiline": True}),
-                "mask_4_prompt_default_value": ("STRING", {"multiline": True}),
-                "mask_5_prompt_default_value": ("STRING", {"multiline": True}),
-                "mask_6_prompt_default_value": ("STRING", {"multiline": True}),
-                "mask_7_prompt_default_value": ("STRING", {"multiline": True}),
             },
         }
 
@@ -40,25 +33,25 @@ class MaskRenderPassSequence:
 
     RETURN_TYPES = (
         "IMAGE",
-        "MASK", "STRING",
-        "MASK", "STRING",
-        "MASK", "STRING",
-        "MASK", "STRING",
-        "MASK", "STRING",
-        "MASK", "STRING",
-        "MASK", "STRING",
+        "MASK",
+        "MASK",
+        "MASK",
+        "MASK",
+        "MASK",
+        "MASK",
+        "MASK",
         "MASK"
     )
 
     RETURN_NAMES = (
         "mask_pass",
-        "mask_1", "mask_1_prompt",
-        "mask_2", "mask_2_prompt",
-        "mask_3", "mask_3_prompt",
-        "mask_4", "mask_4_prompt",
-        "mask_5", "mask_5_prompt",
-        "mask_6", "mask_6_prompt",
-        "mask_7", "mask_7_prompt",
+        "mask_1",
+        "mask_2",
+        "mask_3",
+        "mask_4",
+        "mask_5",
+        "mask_6",
+        "mask_7",
         "mask_8"
     )
 
@@ -71,14 +64,7 @@ class MaskRenderPassSequence:
         api_key,
         id,
         label,
-        blur_size,
-        mask_1_prompt_default_value,
-        mask_2_prompt_default_value,
-        mask_3_prompt_default_value,
-        mask_4_prompt_default_value,
-        mask_5_prompt_default_value,
-        mask_6_prompt_default_value,
-        mask_7_prompt_default_value
+        blur_size
     ):
         base_url = "https://accounts.playbookengine.com"
         user_token = None
@@ -120,16 +106,15 @@ class MaskRenderPassSequence:
                     mask_8_batch
                 ) = self.extract_masks_from_zip(zip_content, blur_size)
 
-                # Return the outputs in the same format as maskPass.py
                 return [
                     composite_masks_batch,
-                    mask_1_batch, mask_1_prompt_default_value,
-                    mask_2_batch, mask_2_prompt_default_value,
-                    mask_3_batch, mask_3_prompt_default_value,
-                    mask_4_batch, mask_4_prompt_default_value,
-                    mask_5_batch, mask_5_prompt_default_value,
-                    mask_6_batch, mask_6_prompt_default_value,
-                    mask_7_batch, mask_7_prompt_default_value,
+                    mask_1_batch,
+                    mask_2_batch,
+                    mask_3_batch,
+                    mask_4_batch,
+                    mask_5_batch,
+                    mask_6_batch,
+                    mask_7_batch,
                     mask_8_batch
                 ]
             else:
@@ -184,7 +169,10 @@ class MaskRenderPassSequence:
         composite_masks_batch = torch.cat(composite_masks, dim=0)
         individual_masks_batches = [torch.cat(masks, dim=0) if masks else None for masks in individual_masks_list]
 
-        return (composite_masks_batch, *individual_masks_batches)
+        return (
+            composite_masks_batch,
+            *individual_masks_batches
+        )
 
 # Register the node
 NODE_CLASS_MAPPINGS = {
