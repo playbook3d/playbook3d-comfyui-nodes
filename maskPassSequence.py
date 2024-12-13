@@ -18,7 +18,9 @@ class MaskRenderPassSequence:
         return {
             "required": {
                 "api_key": ("STRING", {"multiline": False}),
-                "blur_radius": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 50.0}),
+                "id": ("STRING", {"multiline": False}),
+                "label": ("STRING", {"multiline": False}),
+                "blur_size": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 50.0}),
             },
         }
 
@@ -29,14 +31,41 @@ class MaskRenderPassSequence:
         m.update(str(time.time()).encode("utf-8"))
         return m.digest().hex()
 
-    # Output a list of images: composite masks and individual masks
-    RETURN_TYPES = ("IMAGE",) + ("IMAGE",) * 8
-    RETURN_NAMES = ("Composite Masks", "Mask 1", "Mask 2", "Mask 3", "Mask 4", "Mask 5", "Mask 6", "Mask 7", "Mask 8")
+    RETURN_TYPES = (
+        "IMAGE",
+        "MASK",
+        "MASK",
+        "MASK",
+        "MASK",
+        "MASK",
+        "MASK",
+        "MASK",
+        "MASK"
+    )
+
+    RETURN_NAMES = (
+        "mask_pass",
+        "mask_1",
+        "mask_2",
+        "mask_3",
+        "mask_4",
+        "mask_5",
+        "mask_6",
+        "mask_7",
+        "mask_8"
+    )
+
     FUNCTION = "parse_mask_sequence"
     OUTPUT_NODE = False
     CATEGORY = "Playbook 3D"
 
-    def parse_mask_sequence(self, api_key, blur_radius):
+    def parse_mask_sequence(
+        self,
+        api_key,
+        id,
+        label,
+        blur_size
+    ):
         base_url = "https://accounts.playbookengine.com"
         user_token = None
 
@@ -54,30 +83,47 @@ class MaskRenderPassSequence:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-
             # Request the download URLs from the endpoint
             mask_request = requests.get(f"{base_url}/upload-assets/get-download-urls", headers=headers)
             if mask_request.status_code == 200:
                 mask_url = mask_request.json()["mask_zip"]
-
                 # Download the zip file
                 mask_response = requests.get(mask_url)
                 if mask_response.status_code != 200:
                     raise ValueError("Failed to download the mask zip file.")
 
-                zip_content = mask_response.content
-
                 # Process the zip file
-                outputs = self.extract_masks_from_zip(zip_content, blur_radius)
+                zip_content = mask_response.content
+                (
+                    composite_masks_batch,
+                    mask_1_batch,
+                    mask_2_batch,
+                    mask_3_batch,
+                    mask_4_batch,
+                    mask_5_batch,
+                    mask_6_batch,
+                    mask_7_batch,
+                    mask_8_batch
+                ) = self.extract_masks_from_zip(zip_content, blur_size)
 
-                return outputs
+                return [
+                    composite_masks_batch,
+                    mask_1_batch,
+                    mask_2_batch,
+                    mask_3_batch,
+                    mask_4_batch,
+                    mask_5_batch,
+                    mask_6_batch,
+                    mask_7_batch,
+                    mask_8_batch
+                ]
             else:
                 raise ValueError("Failed to retrieve mask URL.")
         except Exception as e:
             print(f"Error processing mask sequence: {e}")
             raise ValueError("Mask pass not uploaded or processing error occurred.")
 
-    def extract_masks_from_zip(self, zip_content, blur_radius):
+    def extract_masks_from_zip(self, zip_content, blur_size):
         composite_masks = []
         individual_masks_list = [[] for _ in range(8)]
 
@@ -100,22 +146,33 @@ class MaskRenderPassSequence:
                         composite_mask_tensor = torch.from_numpy(composite_mask.astype(np.float32) / 255.0)[None,]
                         composite_masks.append(composite_mask_tensor)
 
-                        color_codes = ["#ffe906", "#0589d6", "#a2d4d5", "#000016",
-                                       "#00ad58", "#f084cf", "#ee9e3e", "#e6000c"]
+                        color_codes = [
+                            "#ffe906",
+                            "#0589d6",
+                            "#a2d4d5",
+                            "#000016",
+                            "#00ad58",
+                            "#f084cf",
+                            "#ee9e3e",
+                            "#e6000c"
+                        ]
                         color_tuples = [tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) for color in color_codes]
 
                         for idx, color in enumerate(color_tuples):
                             mask_array = ((composite_mask == np.array(color)).all(axis=2)).astype(np.uint8) * 255
                             mask_image = Image.fromarray(mask_array, mode='L')
-                            if blur_radius > 0:
-                                mask_image = mask_image.filter(ImageFilter.GaussianBlur(radius=blur_radius))
+                            if blur_size > 0:
+                                mask_image = mask_image.filter(ImageFilter.GaussianBlur(radius=blur_size))
                             mask_tensor = torch.from_numpy(np.array(mask_image).astype(np.float32) / 255.0)[None,]
                             individual_masks_list[idx].append(mask_tensor)
 
         composite_masks_batch = torch.cat(composite_masks, dim=0)
         individual_masks_batches = [torch.cat(masks, dim=0) if masks else None for masks in individual_masks_list]
 
-        return (composite_masks_batch, *individual_masks_batches)
+        return (
+            composite_masks_batch,
+            *individual_masks_batches
+        )
 
 # Register the node
 NODE_CLASS_MAPPINGS = {
