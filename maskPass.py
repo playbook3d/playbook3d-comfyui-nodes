@@ -12,6 +12,7 @@ class MaskRenderPass:
 
     @classmethod
     def INPUT_TYPES(s):
+        
         return {
             "required": {
                 "api_key": ("STRING", { "multiline": False }),
@@ -19,6 +20,13 @@ class MaskRenderPass:
                 "label": ("STRING", { "multiline": False }),
                 "blur_size": ("FLOAT", { "default": 0.0, "min": 0.0, "max": 50.0 }),
                 "default_value": ("IMAGE",),
+                "mask_1_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_2_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_3_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_4_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_5_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_6_prompt_default_value": ("STRING", { "multiline": True }),
+                "mask_7_prompt_default_value": ("STRING", { "multiline": True }),
             },
         }
 
@@ -31,33 +39,48 @@ class MaskRenderPass:
 
     RETURN_TYPES = (
         "IMAGE",
-        "MASK",
-        "MASK",
-        "MASK",
-        "MASK",
-        "MASK",
-        "MASK",
-        "MASK",
+        "MASK", "STRING",
+        "MASK", "STRING",
+        "MASK", "STRING",
+        "MASK", "STRING",
+        "MASK", "STRING",
+        "MASK", "STRING",
+        "MASK", "STRING",
         "MASK"
     )
 
     RETURN_NAMES = (
         "image",
-        "mask_1",
-        "mask_2",
-        "mask_3",
-        "mask_4",
-        "mask_5",
-        "mask_6",
-        "mask_7",
+        "mask_1", "mask_1_prompt",
+        "mask_2", "mask_2_prompt",
+        "mask_3", "mask_3_prompt",
+        "mask_4", "mask_4_prompt",
+        "mask_5", "mask_5_prompt",
+        "mask_6", "mask_6_prompt",
+        "mask_7", "mask_7_prompt",
         "mask_8"
     )
 
     FUNCTION = "parse_mask"
+
     OUTPUT_NODE = {False}
     CATEGORY = "Playbook 3D"
 
-    def parse_mask(self, api_key, id, label, blur_size, default_value):
+    def parse_mask(
+        self,
+        api_key,
+        id,
+        label,
+        blur_size,
+        default_value,
+        mask_1_prompt_default_value,
+        mask_2_prompt_default_value,
+        mask_3_prompt_default_value,
+        mask_4_prompt_default_value,
+        mask_5_prompt_default_value,
+        mask_6_prompt_default_value,
+        mask_7_prompt_default_value
+    ):
         base_url = "https://accounts.playbookengine.com"
         user_token = None
 
@@ -80,6 +103,7 @@ class MaskRenderPass:
                 image = ImageOps.exif_transpose(image)
                 image = image.convert("RGB")
 
+                # this creates a composite mask as a tensor
                 composite_mask = np.array(image)
                 composite_mask_tensor = torch.from_numpy(composite_mask.astype(np.float32) / 255.0)[None,]
 
@@ -93,39 +117,36 @@ class MaskRenderPass:
                     "#ee9e3e",
                     "#e6000c"
                 ]
-                color_tuples = [
-                    tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
-                    for color in color_codes
-                ]
+                color_tuples = [tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) for color in color_codes]
 
                 individual_masks = []
                 for color in color_tuples:
                     mask_array = ((composite_mask == np.array(color)).all(axis=2)).astype(np.uint8) * 255
                     mask_image = Image.fromarray(mask_array, mode='L')
+                    # blur application if input is greater than 0
                     if blur_size > 0:
                         mask_image = mask_image.filter(ImageFilter.GaussianBlur(radius=blur_size))
 
-                    mask_tensor = torch.from_numpy(
-                        np.array(mask_image).astype(np.float32) / 255.0
-                    )[None,]
+                    mask_tensor = torch.from_numpy(np.array(mask_image).astype(np.float32) / 255.0)[None,]
                     individual_masks.append(mask_tensor)
 
-                # Ensure all masks have the same shape
                 for i in range(len(individual_masks)):
                     if individual_masks[i].shape != individual_masks[0].shape:
                         individual_masks[i] = torch.nn.functional.interpolate(
                             individual_masks[i], size=individual_masks[0].shape[2:], mode='nearest'
                         )
+                print(mask_1_prompt_default_value)
+                print(mask_2_prompt_default_value)
 
                 return [
                     composite_mask_tensor,
-                    individual_masks[0],
-                    individual_masks[1],
-                    individual_masks[2],
-                    individual_masks[3],
-                    individual_masks[4],
-                    individual_masks[5],
-                    individual_masks[6],
+                    individual_masks[0], mask_1_prompt_default_value,
+                    individual_masks[1], mask_2_prompt_default_value,
+                    individual_masks[2], mask_3_prompt_default_value,
+                    individual_masks[3], mask_4_prompt_default_value,
+                    individual_masks[4], mask_5_prompt_default_value,
+                    individual_masks[5], mask_6_prompt_default_value,
+                    individual_masks[6], mask_7_prompt_default_value,
                     individual_masks[7]
                 ]
 
@@ -135,7 +156,6 @@ class MaskRenderPass:
             print(f"Error while processing masks: {e}")
             raise ValueError("Mask pass not uploaded or processing error occurred.")
 
-
 NODE_CLASS_MAPPINGS = {
     "Playbook Mask": MaskRenderPass
 }
@@ -143,3 +163,5 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Playbook Mask": "Playbook Mask Render Passes"
 }
+
+
