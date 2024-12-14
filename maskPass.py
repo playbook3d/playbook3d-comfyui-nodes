@@ -14,11 +14,11 @@ class MaskRenderPass:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "api_key": ("STRING", { "multiline": False })
+                "api_key": ("STRING", { "multiline": False }),
+                "blur_size": ("FLOAT", { "default": 0.0, "min": 0.0, "max": 50.0 })
             },
             "optional": {
                 "default_value": ("IMAGE",),
-                "blur_size": ("FLOAT", { "default": 0.0, "min": 0.0, "max": 50.0 }),
             }
         }
 
