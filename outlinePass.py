@@ -16,8 +16,10 @@ class OutlineRenderPass:
         return {
             "required": {
                 "api_key": ("STRING", { "multiline": False }),
-                "default_value": ("IMAGE",)
             },
+            "optional": {
+                "default_value": ("IMAGE",)
+            }
         }
 
     @classmethod
@@ -35,7 +37,7 @@ class OutlineRenderPass:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_outline(self, api_key, default_value):
+    def parse_outline(self, api_key, default_value=None):
         base_url = "https://accounts.playbookengine.com"
         user_token = None
 
