@@ -15,8 +15,6 @@ class MaskRenderPass:
         return {
             "required": {
                 "api_key": ("STRING", { "multiline": False }),
-                "id": ("STRING", { "multiline": False }),
-                "label": ("STRING", { "multiline": False }),
                 "blur_size": ("FLOAT", { "default": 0.0, "min": 0.0, "max": 50.0 }),
             },
             "optional": {
@@ -59,7 +57,7 @@ class MaskRenderPass:
     OUTPUT_NODE = {False}
     CATEGORY = "Playbook 3D"
 
-    def parse_mask(self, api_key, id, label, blur_size, default_value=None):
+    def parse_mask(self, api_key, blur_size, default_value=None):
         base_url = "https://accounts.playbookengine.com"
         user_token = None
 
