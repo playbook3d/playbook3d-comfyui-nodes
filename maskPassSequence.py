@@ -18,8 +18,6 @@ class MaskRenderPassSequence:
         return {
             "required": {
                 "api_key": ("STRING", {"multiline": False}),
-                "id": ("STRING", {"multiline": False}),
-                "label": ("STRING", {"multiline": False}),
                 "blur_size": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 50.0}),
             },
         }
@@ -62,8 +60,6 @@ class MaskRenderPassSequence:
     def parse_mask_sequence(
         self,
         api_key,
-        id,
-        label,
         blur_size
     ):
         base_url = "https://accounts.playbookengine.com"
