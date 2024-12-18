@@ -62,7 +62,7 @@ class MaskRenderPassSequence:
         api_key,
         blur_size
     ):
-        base_url = "https://accounts.playbookengine.com"
+        base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
         # Authenticate using the API key

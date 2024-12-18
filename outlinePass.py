@@ -38,7 +38,7 @@ class OutlineRenderPass:
     CATEGORY = "Playbook 3D"
 
     def parse_outline(self, api_key, default_value=None):
-        base_url = "https://accounts.playbookengine.com"
+        base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
         jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")

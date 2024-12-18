@@ -35,7 +35,7 @@ class UploadRenderResult:
         buffer.seek(0)
         img_data = buffer.getvalue()
 
-        base_url = "https://accounts.playbookengine.com"
+        base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
         jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
 

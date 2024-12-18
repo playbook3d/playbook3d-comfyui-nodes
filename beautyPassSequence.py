@@ -36,7 +36,7 @@ class BeautyRenderPassSequence:
     CATEGORY = "Playbook 3D"
 
     def parse_beauty_sequence(self, api_key):
-        base_url = "https://accounts.playbookengine.com"
+        base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
         jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
