@@ -15,6 +15,7 @@ class MaskRenderPass:
         return {
             "required": {
                 "api_key": ("STRING", { "multiline": False }),
+                "run_id": ("STRING", { "multiline": False }),
                 "blur_size": ("FLOAT", { "default": 0.0, "min": 0.0, "max": 50.0 })
             },
             "optional": {
@@ -57,7 +58,7 @@ class MaskRenderPass:
     OUTPUT_NODE = {False}
     CATEGORY = "Playbook 3D"
 
-    def parse_mask(self, api_key, blur_size, default_value=None):
+    def parse_mask(self, api_key, run_id, blur_size, default_value=None):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
@@ -72,9 +73,12 @@ class MaskRenderPass:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            mask_request = requests.get(f"{base_url}/upload-assets/get-download-urls", headers=headers)
+            mask_request = requests.get(f"{base_url}/upload-assets/get-download-urls?run_id={run_id}", headers=headers)
             if mask_request.status_code == 200:
-                mask_url = mask_request.json()["mask"]
+                mask_url = mask_request.json().get("mask", None)
+                if not mask_url:
+                    raise ValueError("Mask pass URL not found for this run_id.")
+
                 mask_response = requests.get(mask_url)
                 image = Image.open(BytesIO(mask_response.content))
                 image = ImageOps.exif_transpose(image)
@@ -130,7 +134,7 @@ class MaskRenderPass:
                 ]
 
             else:
-                raise ValueError("Failed to retrieve mask URL.")
+                raise ValueError(f"Failed to retrieve mask URL for run_id {run_id}.")
         except Exception as e:
             print(f"Error while processing masks: {e}")
             raise ValueError("Mask pass not uploaded or processing error occurred.")

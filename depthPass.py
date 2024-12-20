@@ -15,18 +15,18 @@ class DepthRenderPass:
         return {
             "required": {
                 "api_key": ("STRING", { "multiline": False }),
+                "run_id": ("STRING", { "multiline": False })
             },
             "optional": {
                 "default_value": ("IMAGE",)
             }
         }
 
-
-
     @classmethod
     def IS_CHANGED(s, image):
         # always update
-        m = hashlib.sha256().update(str(time.time()).encode("utf-8"))
+        m = hashlib.sha256()
+        m.update(str(time.time()).encode("utf-8"))
         return m.digest().hex()
 
     RETURN_TYPES = ("IMAGE",)
@@ -38,7 +38,7 @@ class DepthRenderPass:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_depth(self, api_key, default_value=None):
+    def parse_depth(self, api_key, run_id, default_value=None):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
@@ -53,21 +53,24 @@ class DepthRenderPass:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            depth_request = requests.get(f"{base_url}/upload-assets/get-download-urls", headers=headers)
+            depth_request = requests.get(f"{base_url}/upload-assets/get-download-urls?run_id={run_id}", headers=headers)
             if depth_request.status_code == 200:
-                depth_url = depth_request.json()["depth"]
-                depth_response = requests.get(depth_url)
-                image = Image.open(BytesIO(depth_response.content))
-                image = ImageOps.exif_transpose(image)
-                image = image.convert("RGB")
-                image = np.array(image).astype(np.float32) / 255.0
-                image = torch.from_numpy(image)[None,]
-                return [image]
+                depth_url = depth_request.json().get("depth", None)
+                if depth_url:
+                    depth_response = requests.get(depth_url)
+                    image = Image.open(BytesIO(depth_response.content))
+                    image = ImageOps.exif_transpose(image)
+                    image = image.convert("RGB")
+                    image = np.array(image).astype(np.float32) / 255.0
+                    image = torch.from_numpy(image)[None,]
+                    return [image]
+                else:
+                    return [default_value]
             else:
                 return [default_value]
-        except Exception:
+        except Exception as e:
+            print(f"Error retrieving depth pass: {e}")
             return [default_value]
-        
 
 
 NODE_CLASS_MAPPINGS = {

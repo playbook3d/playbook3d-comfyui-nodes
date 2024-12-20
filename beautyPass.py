@@ -15,6 +15,7 @@ class BeautyRenderPass:
         return {
             "required": {
                 "api_key": ("STRING", { "multiline": False }),
+                "run_id": ("STRING", { "multiline": False })
             },
             "optional": {
                 "default_value": ("IMAGE",)
@@ -24,7 +25,8 @@ class BeautyRenderPass:
     @classmethod
     def IS_CHANGED(s, image):
         # always update
-        m = hashlib.sha256().update(str(time.time()).encode("utf-8"))
+        m = hashlib.sha256()
+        m.update(str(time.time()).encode("utf-8"))
         return m.digest().hex()
 
     RETURN_TYPES = ("IMAGE",)
@@ -36,7 +38,7 @@ class BeautyRenderPass:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_beauty(self, api_key, default_value=None):
+    def parse_beauty(self, api_key, run_id, default_value=None):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
         jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
@@ -50,19 +52,24 @@ class BeautyRenderPass:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            beauty_request = requests.get(f"{base_url}/upload-assets/get-download-urls", headers=headers)
+            beauty_request = requests.get(f"{base_url}/upload-assets/get-download-urls?run_id={run_id}", headers=headers)
             if beauty_request.status_code == 200:
-                beauty_url = beauty_request.json()["beauty"]
-                beauty_response = requests.get(beauty_url)
-                image = Image.open(BytesIO(beauty_response.content))
-                image = ImageOps.exif_transpose(image)
-                image = image.convert("RGB")
-                image = np.array(image).astype(np.float32) / 255.0
-                image = torch.from_numpy(image)[None,]
-                return [image]
+                beauty_url = beauty_request.json().get("beauty", None)
+                if beauty_url:
+                    beauty_response = requests.get(beauty_url)
+                    image = Image.open(BytesIO(beauty_response.content))
+                    image = ImageOps.exif_transpose(image)
+                    image = image.convert("RGB")
+                    image = np.array(image).astype(np.float32) / 255.0
+                    image = torch.from_numpy(image)[None,]
+                    return [image]
+                else:
+                    # If "beauty" key not found for this run_id
+                    return [default_value]
             else:
                 return [default_value]
-        except Exception:
+        except Exception as e:
+            print(f"Error retrieving beauty pass: {e}")
             return [default_value]
 
 
