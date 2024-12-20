@@ -11,20 +11,20 @@ class MaskRenderPass:
         pass
 
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
             "required": {
                 "api_key": ("STRING", { "multiline": False }),
-                "run_id": ("STRING", { "multiline": False }),
                 "blur_size": ("FLOAT", { "default": 0.0, "min": 0.0, "max": 50.0 })
             },
             "optional": {
+                "run_id": ("STRING", { "multiline": False }),
                 "default_value": ("IMAGE",),
             }
         }
 
     @classmethod
-    def IS_CHANGED(s, image):
+    def IS_CHANGED(cls, image):
         # Always update
         m = hashlib.sha256()
         m.update(str(time.time()).encode("utf-8"))
@@ -58,7 +58,7 @@ class MaskRenderPass:
     OUTPUT_NODE = {False}
     CATEGORY = "Playbook 3D"
 
-    def parse_mask(self, api_key, run_id, blur_size, default_value=None):
+    def parse_mask(self, api_key, blur_size, run_id=None, default_value=None):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
@@ -73,9 +73,13 @@ class MaskRenderPass:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            mask_request = requests.get(f"{base_url}/upload-assets/get-download-urls?run_id={run_id}", headers=headers)
+            url = f"{base_url}/upload-assets/get-download-urls"
+            if run_id:
+                url += f"?run_id={run_id}"
+
+            mask_request = requests.get(url, headers=headers)
             if mask_request.status_code == 200:
-                mask_url = mask_request.json().get("mask", None)
+                mask_url = mask_request.json().get("mask")
                 if not mask_url:
                     raise ValueError("Mask pass URL not found for this run_id.")
 
@@ -134,11 +138,15 @@ class MaskRenderPass:
                 ]
 
             else:
-                raise ValueError(f"Failed to retrieve mask URL for run_id {run_id}.")
+                # If no run_id was given or the request failed, fallback to default
+                if run_id:
+                    raise ValueError(f"Failed to retrieve mask URL for run_id {run_id}.")
+                return [default_value] * 9  # Return default for all outputs in case of no data
         except Exception as e:
             print(f"Error while processing masks: {e}")
-            raise ValueError("Mask pass not uploaded or processing error occurred.")
-
+            if run_id:
+                raise ValueError("Mask pass not uploaded or processing error occurred.")
+            return [default_value] * 9
 
 NODE_CLASS_MAPPINGS = {
     "Playbook Mask": MaskRenderPass
