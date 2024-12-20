@@ -21,6 +21,9 @@ class BeautyRenderPassSequence:
             "required": {
                 "api_key": ("STRING", {"multiline": False}),
             },
+            "optional": {
+                "run_id": ("STRING", {"multiline": False})
+            }
         }
 
     @classmethod
@@ -35,7 +38,7 @@ class BeautyRenderPassSequence:
     OUTPUT_NODE = False
     CATEGORY = "Playbook 3D"
 
-    def parse_beauty_sequence(self, api_key):
+    def parse_beauty_sequence(self, api_key, run_id=None):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
@@ -51,9 +54,15 @@ class BeautyRenderPassSequence:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            beauty_request = requests.get(f"{base_url}/upload-assets/get-download-urls", headers=headers)
+            url = f"{base_url}/upload-assets/get-download-urls"
+            if run_id:
+                url += f"?run_id={run_id}"
+
+            beauty_request = requests.get(url, headers=headers)
             if beauty_request.status_code == 200:
-                beauty_url = beauty_request.json()["beauty_zip"]
+                beauty_url = beauty_request.json().get("beauty_zip", None)
+                if not beauty_url:
+                    raise ValueError("No beauty zip found for the provided parameters.")
 
                 # Download the zip file
                 beauty_response = requests.get(beauty_url)
@@ -80,8 +89,9 @@ class BeautyRenderPassSequence:
                 f.write(zip_content)
 
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                # Get a list of image file names, sorted in ascending order
-                image_files = sorted([f for f in zip_ref.namelist() if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+                image_files = sorted(
+                    [f for f in zip_ref.namelist() if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+                )
                 for file_name in image_files:
                     with zip_ref.open(file_name) as img_file:
                         image = Image.open(BytesIO(img_file.read()))
