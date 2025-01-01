@@ -75,7 +75,7 @@ class PlaybookVideo:
                 return [None]
         except Exception as e:
             print(f"Exception while downloading or processing frames: {e}")
-            return [None]
+            return [ frames ]
 
 NODE_CLASS_MAPPINGS = {
     "Playbook Video": PlaybookVideo
