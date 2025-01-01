@@ -20,19 +20,20 @@ class PlaybookVideo:
                 "select_every_nth": ("INT", {"default": 1, "min": 1, "max": 1000, "step": 1}),
             },
             "optional": {
-                "default_value": ("VIDEO",)
+                "default_value": ("VIDEO"),
+                "url": ("STRING", {"multiline": False, "default": ""})
             },
         }
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("Frames",)
+    RETURN_NAMES = ("Images",)
     FUNCTION = "parse_video"
     OUTPUT_NODE = False
     CATEGORY = "Playbook 3D"
 
-    def parse_video(self, id, label, frame_load_cap=0, skip_first_frames=0, select_every_nth=1, default_value=None):
-        video_url = id
-        frames = []
+    def parse_video(self, id, label, url, frame_load_cap=0, skip_first_frames=0, select_every_nth=1, default_value=None,):
+        video_url = url
+        frames = default_value
         try:
             if video_url.startswith('http'):
                 video_request = requests.get(video_url, stream=True)
