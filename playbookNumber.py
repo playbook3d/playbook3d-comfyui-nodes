@@ -11,7 +11,7 @@ class PlaybookNumber:
                 "id": ("STRING", {"multiline": False, "default": "Node ID"} ),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"} ),
                 "min_int": ("INT", {"multiline": False, "default": 0, "display": "number"} ),
-                "max_int": ("INT", {"multiline": False, "default": 0, "display": "number"} ),
+                "max_int": ("INT", {"multiline": False, "default": 100, "display": "number"} ),
             },
             "optional": {
                 "default_value": ("INT",

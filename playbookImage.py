@@ -16,7 +16,7 @@ class PlaybookImage:
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
             },
             "optional": {
-                "default_value": ("IMAGE"),
+                "default_value": ("IMAGE",),
                 "url": ("STRING", {"multiline": False, "default": ""})
             },
         }

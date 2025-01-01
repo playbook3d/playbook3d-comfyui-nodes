@@ -20,7 +20,7 @@ class PlaybookVideo:
                 "select_every_nth": ("INT", {"default": 1, "min": 1, "max": 1000, "step": 1}),
             },
             "optional": {
-                "default_value": ("IMAGE"),
+                "default_value": ("IMAGE",),
                 "url": ("STRING", {"multiline": False, "default": ""})
             },
         }
