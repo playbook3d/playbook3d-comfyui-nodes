@@ -20,7 +20,7 @@ class PlaybookVideo:
                 "select_every_nth": ("INT", {"default": 1, "min": 1, "max": 1000, "step": 1}),
             },
             "optional": {
-                "default_value": ("VIDEO"),
+                "default_value": ("IMAGE"),
                 "url": ("STRING", {"multiline": False, "default": ""})
             },
         }
@@ -31,7 +31,7 @@ class PlaybookVideo:
     OUTPUT_NODE = False
     CATEGORY = "Playbook 3D"
 
-    def parse_video(self, id, label, url, frame_load_cap=0, skip_first_frames=0, select_every_nth=1, default_value=None,):
+    def parse_video(self, id, label, url, default_value, frame_load_cap=0, skip_first_frames=0, select_every_nth=1, ):
         video_url = url
         frames = default_value
         try:

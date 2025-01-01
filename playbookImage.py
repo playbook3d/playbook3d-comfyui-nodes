@@ -30,7 +30,7 @@ class PlaybookImage:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_image(self, id, label, url, default_value = None):
+    def parse_image(self, id, label, url, default_value):
         image_url = url
         image = default_value
         try:
