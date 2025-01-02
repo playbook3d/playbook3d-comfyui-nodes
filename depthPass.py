@@ -11,22 +11,22 @@ class DepthRenderPass:
         pass
 
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
             "required": {
                 "api_key": ("STRING", { "multiline": False }),
             },
             "optional": {
+                "run_id": ("STRING", { "multiline": False }),
                 "default_value": ("IMAGE",)
             }
         }
 
-
-
     @classmethod
-    def IS_CHANGED(s, image):
+    def IS_CHANGED(cls, image):
         # always update
-        m = hashlib.sha256().update(str(time.time()).encode("utf-8"))
+        m = hashlib.sha256()
+        m.update(str(time.time()).encode("utf-8"))
         return m.digest().hex()
 
     RETURN_TYPES = ("IMAGE",)
@@ -34,11 +34,11 @@ class DepthRenderPass:
 
     FUNCTION = "parse_depth"
 
-    OUTPUT_NODE = { False }
+    OUTPUT_NODE = {False}
 
     CATEGORY = "Playbook 3D"
 
-    def parse_depth(self, api_key, default_value=None):
+    def parse_depth(self, api_key, run_id=None, default_value=None):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
@@ -53,22 +53,28 @@ class DepthRenderPass:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            depth_request = requests.get(f"{base_url}/upload-assets/get-download-urls", headers=headers)
+            url = f"{base_url}/upload-assets/get-download-urls"
+            if run_id:
+                url += f"?run_id={run_id}"
+
+            depth_request = requests.get(url, headers=headers)
             if depth_request.status_code == 200:
-                depth_url = depth_request.json()["depth"]
-                depth_response = requests.get(depth_url)
-                image = Image.open(BytesIO(depth_response.content))
-                image = ImageOps.exif_transpose(image)
-                image = image.convert("RGB")
-                image = np.array(image).astype(np.float32) / 255.0
-                image = torch.from_numpy(image)[None,]
-                return [image]
+                depth_url = depth_request.json().get("depth")
+                if depth_url:
+                    depth_response = requests.get(depth_url)
+                    image = Image.open(BytesIO(depth_response.content))
+                    image = ImageOps.exif_transpose(image)
+                    image = image.convert("RGB")
+                    image = np.array(image).astype(np.float32) / 255.0
+                    image = torch.from_numpy(image)[None,]
+                    return [image]
+                else:
+                    return [default_value]
             else:
                 return [default_value]
-        except Exception:
+        except Exception as e:
+            print(f"Error retrieving depth pass: {e}")
             return [default_value]
-        
-
 
 NODE_CLASS_MAPPINGS = {
     "Playbook Depth": DepthRenderPass

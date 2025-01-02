@@ -20,6 +20,9 @@ class MaskRenderPassSequence:
                 "api_key": ("STRING", {"multiline": False}),
                 "blur_size": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 50.0}),
             },
+            "optional": {
+                "run_id": ("STRING", {"multiline": False})
+            }
         }
 
     @classmethod
@@ -60,7 +63,8 @@ class MaskRenderPassSequence:
     def parse_mask_sequence(
         self,
         api_key,
-        blur_size
+        blur_size,
+        run_id=None
     ):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
@@ -79,10 +83,16 @@ class MaskRenderPassSequence:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            # Request the download URLs from the endpoint
-            mask_request = requests.get(f"{base_url}/upload-assets/get-download-urls", headers=headers)
+            url = f"{base_url}/upload-assets/get-download-urls"
+            if run_id:
+                url += f"?run_id={run_id}"
+
+            mask_request = requests.get(url, headers=headers)
             if mask_request.status_code == 200:
-                mask_url = mask_request.json()["mask_zip"]
+                mask_url = mask_request.json().get("mask_zip", None)
+                if not mask_url:
+                    raise ValueError("No mask zip found for the provided parameters.")
+
                 # Download the zip file
                 mask_response = requests.get(mask_url)
                 if mask_response.status_code != 200:
@@ -130,7 +140,10 @@ class MaskRenderPassSequence:
 
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 # Sort the images based on file names
-                image_files = sorted([f for f in zip_ref.namelist() if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+                image_files = sorted([
+                    f for f in zip_ref.namelist() 
+                    if f.lower().endswith(('.png', '.jpg', '.jpeg'))
+                ])
                 for file_name in image_files:
                     # Read image data from the zip file
                     with zip_ref.open(file_name) as img_file:
@@ -152,14 +165,19 @@ class MaskRenderPassSequence:
                             "#ee9e3e",
                             "#e6000c"
                         ]
-                        color_tuples = [tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) for color in color_codes]
+                        color_tuples = [
+                            tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+                            for color in color_codes
+                        ]
 
                         for idx, color in enumerate(color_tuples):
                             mask_array = ((composite_mask == np.array(color)).all(axis=2)).astype(np.uint8) * 255
                             mask_image = Image.fromarray(mask_array, mode='L')
                             if blur_size > 0:
                                 mask_image = mask_image.filter(ImageFilter.GaussianBlur(radius=blur_size))
-                            mask_tensor = torch.from_numpy(np.array(mask_image).astype(np.float32) / 255.0)[None,]
+                            mask_tensor = torch.from_numpy(
+                                np.array(mask_image).astype(np.float32) / 255.0
+                            )[None,]
                             individual_masks_list[idx].append(mask_tensor)
 
         composite_masks_batch = torch.cat(composite_masks, dim=0)
