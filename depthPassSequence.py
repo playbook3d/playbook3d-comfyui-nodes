@@ -1,5 +1,3 @@
-# depthPassSequence.py
-
 from PIL import Image, ImageOps
 import numpy as np
 import torch
@@ -21,6 +19,9 @@ class DepthRenderPassSequence:
             "required": {
                 "api_key": ("STRING", {"multiline": False}),
             },
+            "optional": {
+                "run_id": ("STRING", {"multiline": False})
+            }
         }
 
     @classmethod
@@ -35,7 +36,7 @@ class DepthRenderPassSequence:
     OUTPUT_NODE = False
     CATEGORY = "Playbook 3D"
 
-    def parse_depth_sequence(self, api_key):
+    def parse_depth_sequence(self, api_key, run_id=None):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
@@ -52,9 +53,15 @@ class DepthRenderPassSequence:
 
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            depth_request = requests.get(f"{base_url}/upload-assets/get-download-urls", headers=headers)
+            url = f"{base_url}/upload-assets/get-download-urls"
+            if run_id:
+                url += f"?run_id={run_id}"
+
+            depth_request = requests.get(url, headers=headers)
             if depth_request.status_code == 200:
-                depth_url = depth_request.json()["depth_zip"]
+                depth_url = depth_request.json().get("depth_zip", None)
+                if not depth_url:
+                    raise ValueError("No depth zip found for the provided parameters.")
 
                 # Download the zip file
                 depth_response = requests.get(depth_url)
@@ -81,8 +88,9 @@ class DepthRenderPassSequence:
                 f.write(zip_content)
 
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                # Sort the file names in ascending order
-                image_files = sorted([f for f in zip_ref.namelist() if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+                image_files = sorted(
+                    [f for f in zip_ref.namelist() if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+                )
                 for file_name in image_files:
                     with zip_ref.open(file_name) as img_file:
                         image = Image.open(BytesIO(img_file.read()))
@@ -98,7 +106,6 @@ class DepthRenderPassSequence:
         else:
             raise ValueError("No images found in the zip file.")
 
-# Register the node
 NODE_CLASS_MAPPINGS = {
     "Depth Pass Sequence": DepthRenderPassSequence
 }
