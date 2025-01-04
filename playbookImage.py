@@ -17,7 +17,7 @@ class PlaybookImage:
             },
             "optional": {
                 "default_value": ("IMAGE",),
-                "url": ("STRING", {"multiline": False, "default": ""})
+                "default_url": ("STRING", {"multiline": False, "default": ""})
             },
         }
 
@@ -30,11 +30,11 @@ class PlaybookImage:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_image(self, id, label, url, default_value):
-        image_url = url
+    def parse_image(self, id, label, default_url, default_value):
+        image_url = default_url
         image = default_value
         try:
-            if url.startswith('http'):
+            if image_url.startswith('http'):
                 image_request = requests.get(image_url)
                 image = Image.open(BytesIO(image_request.content))
             else:

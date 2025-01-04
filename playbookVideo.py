@@ -21,7 +21,7 @@ class PlaybookVideo:
             },
             "optional": {
                 "default_value": ("IMAGE",),
-                "url": ("STRING", {"multiline": False, "default": ""})
+                "default_url": ("STRING", {"multiline": False, "default": ""})
             },
         }
 
@@ -31,8 +31,8 @@ class PlaybookVideo:
     OUTPUT_NODE = False
     CATEGORY = "Playbook 3D"
 
-    def parse_video(self, id, label, url, default_value, frame_load_cap=0, skip_first_frames=0, select_every_nth=1, ):
-        video_url = url
+    def parse_video(self, id, label, default_url, default_value, frame_load_cap=0, skip_first_frames=0, select_every_nth=1, ):
+        video_url = default_url
         frames = default_value
         try:
             if video_url.startswith('http'):
