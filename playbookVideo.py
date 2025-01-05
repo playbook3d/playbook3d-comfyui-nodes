@@ -26,7 +26,7 @@ class PlaybookVideo:
         }
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("Images",)
+    RETURN_NAMES = ("images",)
     FUNCTION = "parse_video"
     OUTPUT_NODE = False
     CATEGORY = "Playbook 3D"
