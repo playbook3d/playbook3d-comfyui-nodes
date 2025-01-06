@@ -16,7 +16,7 @@ class PlaybookText:
         }
     
     RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("Text", "Trigger Words")
+    RETURN_NAMES = ("text", "trigger_words")
 
     FUNCTION = "parse_text"
 

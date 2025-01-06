@@ -10,8 +10,8 @@ class PlaybookNumber:
             "required": {
                 "id": ("STRING", {"multiline": False, "default": "Node ID"} ),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"} ),
-                "min_int": ("INT", {"multiline": False, "default": 0, "display": "number"} ),
-                "max_int": ("INT", {"multiline": False, "default": 100, "display": "number"} ),
+                "min": ("INT", {"multiline": False, "default": 0, "display": "number"} ),
+                "max": ("INT", {"multiline": False, "default": 100, "display": "number"} ),
             },
             "optional": {
                 "default_value": ("INT",
@@ -27,7 +27,7 @@ class PlaybookNumber:
         }
 
     RETURN_TYPES = ("INT",)
-    RETURN_NAMES = ("Int",)
+    RETURN_NAMES = ("number",)
 
     FUNCTION = "parse_number"
 
@@ -35,11 +35,11 @@ class PlaybookNumber:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_number(self, id, min_int, max_int, label, default_value = None):
+    def parse_number(self, id, min, max, label, default_value = None):
         if not id or (isinstance(id, str) and not id.strip().isdigit()):
-            return [np.clip(default_value, min_int, max_int)]
+            return [np.clip(default_value, min, max)]
         id_int = int(id)
-        return [np.clip(id_int, min_int, max_int)]
+        return [np.clip(id_int, min, max)]
 
 
 NODE_CLASS_MAPPINGS = { "Playbook Number": PlaybookNumber }

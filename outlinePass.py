@@ -15,6 +15,7 @@ class OutlineRenderPass:
     def INPUT_TYPES(s):
         return {
             "required": {
+                "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "api_key": ("STRING", { "multiline": False }),
             },
             "optional": {
@@ -29,7 +30,7 @@ class OutlineRenderPass:
         return m.digest().hex()
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("Image",)
+    RETURN_NAMES = ("image",)
 
     FUNCTION = "parse_outline"
 
@@ -37,7 +38,7 @@ class OutlineRenderPass:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_outline(self, api_key, default_value=None):
+    def parse_outline(self, api_key, id, default_value=None):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 

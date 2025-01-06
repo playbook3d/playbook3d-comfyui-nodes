@@ -19,6 +19,7 @@ class DepthRenderPassSequence:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "api_key": ("STRING", {"multiline": False}),
             },
         }
@@ -30,12 +31,12 @@ class DepthRenderPassSequence:
         return m.digest().hex()
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("Images",)
+    RETURN_NAMES = ("images",)
     FUNCTION = "parse_depth_sequence"
     OUTPUT_NODE = False
     CATEGORY = "Playbook 3D"
 
-    def parse_depth_sequence(self, api_key):
+    def parse_depth_sequence(self, api_key, id):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
@@ -98,11 +99,10 @@ class DepthRenderPassSequence:
         else:
             raise ValueError("No images found in the zip file.")
 
-# Register the node
 NODE_CLASS_MAPPINGS = {
-    "Depth Pass Sequence": DepthRenderPassSequence
+    "Playbook Depth Sequence": DepthRenderPassSequence
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Depth Pass Sequence": "Depth Pass Sequence"
+    "Playbook Depth Sequence": "Playbook Depth Render Pass Sequence"
 }

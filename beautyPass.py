@@ -14,6 +14,7 @@ class BeautyRenderPass:
     def INPUT_TYPES(s):
         return {
             "required": {
+                "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "api_key": ("STRING", { "multiline": False }),
             },
             "optional": {
@@ -28,7 +29,7 @@ class BeautyRenderPass:
         return m.digest().hex()
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("Image",)
+    RETURN_NAMES = ("image",)
 
     FUNCTION = "parse_beauty"
 
@@ -36,7 +37,7 @@ class BeautyRenderPass:
 
     CATEGORY = "Playbook 3D"
 
-    def parse_beauty(self, api_key, default_value=None):
+    def parse_beauty(self, api_key, id, default_value=None):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
         jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
@@ -71,5 +72,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Playbook Beauty": "Playbook Beauty Render Passes"
+    "Playbook Beauty": "Playbook Beauty Render Pass"
 }

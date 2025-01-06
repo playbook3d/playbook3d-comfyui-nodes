@@ -17,6 +17,7 @@ class MaskRenderPassSequence:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "api_key": ("STRING", {"multiline": False}),
                 "blur_size": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 50.0}),
             },
@@ -42,7 +43,7 @@ class MaskRenderPassSequence:
     )
 
     RETURN_NAMES = (
-        "mask_pass",
+        "images",
         "mask_1",
         "mask_2",
         "mask_3",
@@ -60,7 +61,8 @@ class MaskRenderPassSequence:
     def parse_mask_sequence(
         self,
         api_key,
-        blur_size
+        blur_size,
+        id
     ):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
@@ -170,11 +172,10 @@ class MaskRenderPassSequence:
             *individual_masks_batches
         )
 
-# Register the node
 NODE_CLASS_MAPPINGS = {
-    "Mask Pass Sequence": MaskRenderPassSequence
+    "Playbook Mask Sequence": MaskRenderPassSequence
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Mask Pass Sequence": "Mask Pass Sequence"
+    "Playbook Mask Sequence": "Playbook Mask Render Pass Sequence"
 }
