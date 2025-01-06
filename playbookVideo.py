@@ -21,7 +21,7 @@ class PlaybookVideo:
             },
             "optional": {
                 "default_value": ("IMAGE",),
-                "url": ("STRING", {"multiline": False, "default": ""})
+                "default_url": ("STRING", {"multiline": False, "default": ""})
             },
         }
 
