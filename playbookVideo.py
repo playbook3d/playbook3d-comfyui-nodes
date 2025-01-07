@@ -31,12 +31,12 @@ class PlaybookVideo:
     OUTPUT_NODE = False
     CATEGORY = "Playbook 3D"
 
-    def parse_video(self, id, label, url="", frame_load_cap=0, skip_first_frames=0, select_every_nth=1, default_value=None):
+    def parse_video(self, id, label, default_url="", frame_load_cap=0, skip_first_frames=0, select_every_nth=1, default_value=None):
         try:
             frames = []
-            if url and url.startswith('http'):
-                print(f"Debug: Downloading video from {url}")
-                video_request = requests.get(url, stream=True)
+            if default_url and default_url.startswith('http'):
+                print(f"Debug: Downloading video from {default_url}")
+                video_request = requests.get(default_url, stream=True)
                 if video_request.status_code != 200:
                     print(f"Debug: Failed to download video, status code: {video_request.status_code}")
                     if default_value is not None:
@@ -94,8 +94,8 @@ class PlaybookVideo:
                     print(f"Debug: Final tensor dtype: {frames_tensor.dtype}")
                     return (frames_tensor,)
 
-            # If no valid URL or no frames extracted
-            print("Debug: No valid URL or no frames extracted")
+            # If no valid default_url or no frames extracted
+            print("Debug: No valid default_url or no frames extracted")
             if default_value is not None:
                 print("Debug: Using default value")
                 return (default_value,)
