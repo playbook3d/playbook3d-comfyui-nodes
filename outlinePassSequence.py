@@ -19,7 +19,6 @@ class OutlineRenderPassSequence:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "api_key": ("STRING", {"multiline": False}),
             },
         }
@@ -31,12 +30,12 @@ class OutlineRenderPassSequence:
         return m.digest().hex()
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("images",)
+    RETURN_NAMES = ("Images",)
     FUNCTION = "parse_outline_sequence"
     OUTPUT_NODE = False
     CATEGORY = "Playbook 3D"
 
-    def parse_outline_sequence(self, api_key, id):
+    def parse_outline_sequence(self, api_key):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
@@ -99,11 +98,11 @@ class OutlineRenderPassSequence:
         else:
             raise ValueError("No images found in the zip file.")
 
-
+# Register the node
 NODE_CLASS_MAPPINGS = {
-    "Playbook Outline Sequence": OutlineRenderPassSequence
+    "Outline Pass Sequence": OutlineRenderPassSequence
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Playbook Outline Sequence": "Playbook Outline Render Pass Sequence"
+    "Outline Pass Sequence": "Outline Pass Sequence"
 }

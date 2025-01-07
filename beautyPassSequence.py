@@ -19,7 +19,6 @@ class BeautyRenderPassSequence:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "api_key": ("STRING", {"multiline": False}),
             },
         }
@@ -31,12 +30,12 @@ class BeautyRenderPassSequence:
         return m.digest().hex()
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("images",)
+    RETURN_NAMES = ("Images",)
     FUNCTION = "parse_beauty_sequence"
     OUTPUT_NODE = False
     CATEGORY = "Playbook 3D"
 
-    def parse_beauty_sequence(self, api_key, id):
+    def parse_beauty_sequence(self, api_key):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
@@ -99,9 +98,9 @@ class BeautyRenderPassSequence:
             raise ValueError("No images found in the zip file.")
 
 NODE_CLASS_MAPPINGS = {
-    "Playbook Beauty Sequence": BeautyRenderPassSequence
+    "Beauty Pass Sequence": BeautyRenderPassSequence
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Playbook Beauty Sequence": "Playbook Beauty Render Pass Sequence"
+    "Beauty Pass Sequence": "Beauty Pass Sequence"
 }

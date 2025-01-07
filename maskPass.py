@@ -14,7 +14,6 @@ class MaskRenderPass:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "api_key": ("STRING", { "multiline": False }),
                 "blur_size": ("FLOAT", { "default": 0.0, "min": 0.0, "max": 50.0 })
             },
@@ -58,7 +57,7 @@ class MaskRenderPass:
     OUTPUT_NODE = {False}
     CATEGORY = "Playbook 3D"
 
-    def parse_mask(self, api_key, blur_size, id, default_value=None):
+    def parse_mask(self, api_key, blur_size, default_value=None):
         base_url = "https://dev-accounts.playbook3d.com"
         user_token = None
 
@@ -142,5 +141,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Playbook Mask": "Playbook Mask Render Pass"
+    "Playbook Mask": "Playbook Mask Render Passes"
 }
