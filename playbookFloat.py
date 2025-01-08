@@ -11,7 +11,7 @@ class PlaybookFloat:
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
                 "min": ("FLOAT", {"multiline": False, "default": 0, "display": "number"}),
-                "max": ("FLOAT", {"multiline": False, "default": 0, "display": "number"}),
+                "max": ("FLOAT", {"multiline": False, "default": 1.0, "display": "number"}),
             },
             "optional": {
                 "default_value": ("FLOAT",
