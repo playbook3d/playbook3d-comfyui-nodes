@@ -8,18 +8,21 @@ class AspectRatioSelect:
             "required": {
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
-                "aspect_ratio": (
-                    "DROPDOWN",
+                "dropdown_option": (
+                    "STRING",
                     {
-                        "VALUES": [(1, 1), (16, 9), (9, 16), (4, 3), (3, 4)],
-                        "DEFAULT": (1, 1),
+                        "WIDGET": "COMBO",
+                        "VALUES": ["Option1", "Option2", "Option3"],
+                        "DEFAULT": "Option1",
                     },
                 ),
             }
         }
 
-    RETURN_TYPES = ("INT", "INT")
-    RETURN_NAMES = ("x", "y")
+    # RETURN_TYPES = ("INT", "INT")
+    RETURN_TYPES = "STRING"
+    # RETURN_NAMES = ("x", "y")
+    RETURN_NAMES = "x"
 
     FUNCTION = "return_aspect_ratio"
 
@@ -28,10 +31,7 @@ class AspectRatioSelect:
     CATEGORY = "Playbook 3D"
 
     def get_aspect_ratio(self, id, label, aspect_ratio):
-        return {
-            "x": aspect_ratio[0],
-            "y": aspect_ratio[1],
-        }
+        return aspect_ratio
 
 
 NODE_CLASS_MAPPINGS = {"Playbook Aspect Ratio Select": AspectRatioSelect}
