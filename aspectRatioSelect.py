@@ -9,9 +9,8 @@ class AspectRatioSelect:
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
                 "aspect_ratio": (
-                    "STRING",
+                    "DROPDOWN",
                     {
-                        "WIDGET": "COMBO",
                         "VALUES": [(1, 1), (16, 9), (9, 16), (4, 3), (3, 4)],
                         "DEFAULT": (1, 1),
                     },
