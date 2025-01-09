@@ -34,6 +34,8 @@ class AspectRatioSelect:
         }
 
 
-NODE_CLASS_MAPPINGS = {"Aspect Ratio Select": AspectRatioSelect}
+NODE_CLASS_MAPPINGS = {"Playbook Aspect Ratio Select": AspectRatioSelect}
 
-NODE_DISPLAY_NAME_MAPPINGS = {"Aspect Ratio Select": "Playbook Aspect Ratio Select"}
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "Playbook Aspect Ratio Select": "Playbook Aspect Ratio Select"
+}
