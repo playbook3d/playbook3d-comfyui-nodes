@@ -11,9 +11,9 @@ class AspectRatioSelect:
                 "aspect_ratio": (
                     "ENUM",
                     {
-                        "WIDGET": "Enum",
-                        "VALUES": [(1, 1), (16, 9), (9, 16), (4, 3), (3, 4)],
-                        "DEFAULT": (1, 1),
+                        "widget": "Enum",
+                        "values": [(1, 1), (16, 9), (9, 16), (4, 3), (3, 4)],
+                        "default": (1, 1),
                     },
                 ),
             }
