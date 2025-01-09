@@ -8,13 +8,7 @@ class AspectRatioSelect:
             "required": {
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
-                "dropdown_option": (
-                    "COMBO",
-                    {
-                        "VALUES": ["Option1", "Option2", "Option3"],
-                        "DEFAULT": "Option1",
-                    },
-                ),
+                "dropdown_option": (["Option1", "Option2", "Option3"],),
             }
         }
 
