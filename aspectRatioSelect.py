@@ -9,9 +9,8 @@ class AspectRatioSelect:
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
                 "dropdown_option": (
-                    "STRING",
+                    "COMBO",
                     {
-                        "WIDGET": "COMBO",
                         "VALUES": ["Option1", "Option2", "Option3"],
                         "DEFAULT": "Option1",
                     },
@@ -20,9 +19,9 @@ class AspectRatioSelect:
         }
 
     # RETURN_TYPES = ("INT", "INT")
-    RETURN_TYPES = "STRING"
+    RETURN_TYPES = ("STRING",)
     # RETURN_NAMES = ("x", "y")
-    RETURN_NAMES = "x"
+    RETURN_NAMES = ("x",)
 
     FUNCTION = "return_aspect_ratio"
 
