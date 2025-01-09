@@ -21,11 +21,11 @@ class AspectRatioSelect:
     RETURN_TYPES = ("INT", "INT")
     RETURN_NAMES = ("x", "y")
 
-    FUNCTION = {"return_aspect_ratio"}
+    FUNCTION = "return_aspect_ratio"
 
     OUTPUT_NODE = {False}
 
-    CATEGORY = {"Playbook 3D"}
+    CATEGORY = "Playbook 3D"
 
     def get_aspect_ratio(self, id, label, aspect_ratio):
         return {
