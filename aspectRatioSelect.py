@@ -9,11 +9,11 @@ class AspectRatioSelect:
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
                 "aspect_ratio": (
-                    "ENUM",
+                    "STRING",
                     {
-                        "widget": "Enum",
-                        "values": [(1, 1), (16, 9), (9, 16), (4, 3), (3, 4)],
-                        "default": (1, 1),
+                        "WIDGET": "COMBO",
+                        "VALUES": [(1, 1), (16, 9), (9, 16), (4, 3), (3, 4)],
+                        "DEFAULT": (1, 1),
                     },
                 ),
             }
