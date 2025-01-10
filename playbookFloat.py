@@ -1,3 +1,6 @@
+import hashlib
+import time
+
 import numpy as np
 
 class PlaybookFloat:
@@ -26,6 +29,12 @@ class PlaybookFloat:
                 ),
             }
         }
+
+    @classmethod
+    def IS_CHANGED(s, image):
+        # always update
+        m = hashlib.sha256().update(str(time.time()).encode("utf-8"))
+        return m.digest().hex()
 
     RETURN_TYPES = ("FLOAT",)
     RETURN_NAMES = ("float",)

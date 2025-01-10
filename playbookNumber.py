@@ -1,4 +1,6 @@
 import numpy as np
+import hashlib
+import time
 
 class PlaybookNumber:
     def __init__(self):
@@ -25,6 +27,12 @@ class PlaybookNumber:
                 ),
             }
         }
+
+    @classmethod
+    def IS_CHANGED(s, image):
+        # always update
+        m = hashlib.sha256().update(str(time.time()).encode("utf-8"))
+        return m.digest().hex()
 
     RETURN_TYPES = ("INT",)
     RETURN_NAMES = ("number",)

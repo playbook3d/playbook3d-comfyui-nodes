@@ -4,6 +4,8 @@ import cv2
 import requests
 import tempfile
 import os
+import hashlib
+import time
 
 class PlaybookVideo:
     def __init__(self):
@@ -24,6 +26,12 @@ class PlaybookVideo:
                 "default_url": ("STRING", {"multiline": False, "default": ""})
             },
         }
+
+    @classmethod
+    def IS_CHANGED(s, image):
+        # always update
+        m = hashlib.sha256().update(str(time.time()).encode("utf-8"))
+        return m.digest().hex()
 
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("images",)
