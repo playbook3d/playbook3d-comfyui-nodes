@@ -12,7 +12,7 @@ class PlaybookSeed:
         return {
             "required": {
                 "default_value": ("INT", {"multiline": False, "default": 0, "min": 0}),
-                "setting": (["Fixed", "Random"]),
+                "setting": (["Fixed", "Random"],),
             },
         }
 
