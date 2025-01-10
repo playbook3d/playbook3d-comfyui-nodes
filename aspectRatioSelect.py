@@ -14,7 +14,7 @@ class AspectRatioSelect:
             "required": {
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
-                "dropdown_option": (["1:1", "16:9", "9:16", "4:3", "3:4"],),
+                "aspect_ratio": (["1:1", "16:9", "9:16", "4:3", "3:4"],),
             }
         }
 
