@@ -36,7 +36,7 @@ class PlaybookSeed:
 
     CATEGORY = "Playbook 3D"
 
-    def get_seed(self, default_value, setting):
+    def get_seed(self, default_value, id, label, setting):
         """
         Returns a seed depending on the chosen setting.
         If setting is "Fixed", returns the given default_value.
