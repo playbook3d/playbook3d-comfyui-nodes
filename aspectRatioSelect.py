@@ -1,3 +1,7 @@
+import hashlib
+import time
+
+
 class AspectRatioSelect:
     def __init__(self):
         self.aspect_dict = {
@@ -17,6 +21,12 @@ class AspectRatioSelect:
                 "aspect_ratio": (["1:1", "16:9", "9:16", "4:3", "3:4"],),
             }
         }
+
+    @classmethod
+    def IS_CHANGED(s, image):
+        # always update
+        m = hashlib.sha256().update(str(time.time()).encode("utf-8"))
+        return m.digest().hex()
 
     RETURN_TYPES = ("INT", "INT")
     RETURN_NAMES = ("x", "y")
