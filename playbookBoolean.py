@@ -1,3 +1,6 @@
+import hashlib
+import time
+
 class PlaybookBoolean:
     def __init__(self):
         pass
@@ -11,6 +14,12 @@ class PlaybookBoolean:
                 "default_value": ("BOOLEAN", {"default": False})
             },
         }
+
+    @classmethod
+    def IS_CHANGED(s, image):
+        # always update
+        m = hashlib.sha256().update(str(time.time()).encode("utf-8"))
+        return m.digest().hex()
 
     RETURN_TYPES = ( "BOOLEAN", )
     RETURN_NAMES = ("Boolean", )
