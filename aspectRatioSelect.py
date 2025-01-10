@@ -18,7 +18,7 @@ class AspectRatioSelect:
             "required": {
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
-                "aspect_ratio": (["1:1", "16:9", "9:16", "4:3", "3:4"],),
+                "default_value": (["1:1", "16:9", "9:16", "4:3", "3:4"],),
             }
         }
 
@@ -37,8 +37,8 @@ class AspectRatioSelect:
 
     CATEGORY = "Playbook 3D"
 
-    def get_aspect_ratio(self, id, label, aspect_ratio):
-        ratio = self.aspect_dict.get(aspect_ratio, (1, 1))
+    def get_aspect_ratio(self, id, label, default_value):
+        ratio = self.aspect_dict.get(default_value, (1, 1))
 
         return ratio
 
