@@ -28,9 +28,9 @@ class AspectRatioSelect:
     CATEGORY = "Playbook 3D"
 
     def get_aspect_ratio(self, id, label, aspect_ratio):
-        ratio = self.aspect_dict[aspect_ratio]
+        ratio = self.aspect_dict.get([aspect_ratio], (1, 1))
 
-        return {"x": ratio[0], "y": ratio[1]}
+        return ratio
 
 
 NODE_CLASS_MAPPINGS = {"Playbook Aspect Ratio Select": AspectRatioSelect}
