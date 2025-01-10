@@ -11,8 +11,13 @@ class PlaybookSeed:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "default_value": ("INT", {"multiline": False, "default": 0, "min": 0}),
-                "setting": (["Fixed", "Random"],),
+                "default_value": (
+                    "INT",
+                    {"multiline": False, "display": "number", "default": 0},
+                ),
+                "id": ("STRING", {"multiline": False, "default": "Node ID"}),
+                "label": ("STRING", {"multiline": False, "default": "Node Label"}),
+                "setting": (["Fixed", "Random"], {"default": "Fixed"}),
             },
         }
 
