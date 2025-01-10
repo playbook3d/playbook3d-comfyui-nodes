@@ -1,4 +1,4 @@
-class PlaybookLoRASelection():
+class PlaybookLoRASelection:
     def init(self):
         pass
 
