@@ -21,7 +21,7 @@ class AspectRatioSelect:
     RETURN_TYPES = ("INT", "INT")
     RETURN_NAMES = ("x", "y")
 
-    FUNCTION = "return_aspect_ratio"
+    FUNCTION = "get_aspect_ratio"
 
     OUTPUT_NODE = {False}
 
