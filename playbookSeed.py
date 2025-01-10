@@ -44,9 +44,9 @@ class PlaybookSeed:
         """
 
         if setting == "Fixed":
-            return default_value
+            return [default_value]
 
-        return self.generate_random_seed()
+        return [self.generate_random_seed()]
 
     def generate_random_seed(self, num_digits=15) -> int:
         """
