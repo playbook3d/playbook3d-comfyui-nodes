@@ -14,6 +14,7 @@ from .maskPassSequence import MaskRenderPassSequence
 from .outlinePassSequence import OutlineRenderPassSequence
 from .playbookVideo import PlaybookVideo
 from .playbookLoraSelect import PlaybookLoRASelection
+from .playbookSeed import PlaybookSeed
 
 NODE_CLASS_MAPPINGS = {
     "Playbook Depth": DepthRenderPass,
@@ -31,7 +32,8 @@ NODE_CLASS_MAPPINGS = {
     "Playbook Text": PlaybookText,
     "Playbook Image": PlaybookImage,
     "Playbook Video": PlaybookVideo,
-    "Playbook Lora Select": PlaybookLoRASelection
+    "Playbook Lora Select": PlaybookLoRASelection,
+    "Playbook Seed": PlaybookSeed,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -50,8 +52,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Playbook Text": "Playbook Text (External)",
     "Playbook Image": "Playbook Image (External)",
     "Playbook Video": "Playbook Video (External)",
-    "Playbook Lora Select": "Playbook Lora Selection"
+    "Playbook Lora Select": "Playbook Lora Selection",
+    "Playbook Seed": "Playbook Seed",
 }
 
 
-__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
