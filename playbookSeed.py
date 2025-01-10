@@ -11,12 +11,18 @@ class PlaybookSeed:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "default_value": (
-                    "INT",
-                    {"multiline": False, "display": "number", "default": 0},
-                ),
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
+                "default_value": (
+                    "INT",
+                    {
+                        "multiline": False,
+                        "display": "number",
+                        "default": 0,
+                        "min": -9223372036854775807,
+                        "max": 9223372036854775807,
+                    },
+                ),
                 "setting": (["Fixed", "Random"], {"default": "Fixed"}),
             },
         }
@@ -36,7 +42,7 @@ class PlaybookSeed:
 
     CATEGORY = "Playbook 3D"
 
-    def get_seed(self, default_value, id, label, setting):
+    def get_seed(self, id, label, default_value, setting):
         """
         Returns a seed depending on the chosen setting.
         If setting is "Fixed", returns the given default_value.
