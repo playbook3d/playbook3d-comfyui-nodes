@@ -2,7 +2,7 @@ import hashlib
 import time
 
 
-class AspectRatioSelect:
+class PlaybookAspectRatioSelect:
     def __init__(self):
         self.aspect_dict = {
             "1:1": (1, 1),
@@ -43,7 +43,7 @@ class AspectRatioSelect:
         return ratio
 
 
-NODE_CLASS_MAPPINGS = {"Playbook Aspect Ratio Select": AspectRatioSelect}
+NODE_CLASS_MAPPINGS = {"Playbook Aspect Ratio Select": PlaybookAspectRatioSelect}
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Playbook Aspect Ratio Select": "Playbook Aspect Ratio Select"
