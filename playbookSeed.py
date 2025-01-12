@@ -19,6 +19,8 @@ class PlaybookSeed:
                         "multiline": False,
                         "display": "number",
                         "default": 0,
+                        "min": -999999999999999,
+                        "max": 999999999999999,
                     },
                 ),
                 "setting": (["Fixed", "Random"], {"default": "Fixed"}),
