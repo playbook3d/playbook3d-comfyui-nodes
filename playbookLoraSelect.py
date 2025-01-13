@@ -1,3 +1,6 @@
+import hashlib
+import time
+
 class PlaybookLoRASelection:
     def init(self):
         pass
@@ -39,6 +42,12 @@ class PlaybookLoRASelection:
                 ),
             }
         }
+    
+    @classmethod
+    def IS_CHANGED(s, image):
+        # always update
+        m = hashlib.sha256().update(str(time.time()).encode("utf-8"))
+        return m.digest().hex()
 
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("lora_name",)
