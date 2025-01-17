@@ -39,7 +39,7 @@ class DepthRenderPass:
     CATEGORY = "Playbook 3D"
 
     def parse_depth(self, api_key, run_id=None, default_value=None):
-        base_url = "https://dev-accounts.playbook3d.com"
+        base_url = "https://accounts.playbook3d.com"
         user_token = None
 
         jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
