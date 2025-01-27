@@ -55,7 +55,7 @@ class OutlineRenderPassSequence:
             headers = {"Authorization": f"Bearer {user_token}"}
             url = f"{base_url}/upload-assets/get-download-urls"
             if run_id:
-                url += f"?run_id={run_id}"
+                url = f"{url}/{run_id}"
 
             outline_request = requests.get(url, headers=headers)
             if outline_request.status_code == 200:

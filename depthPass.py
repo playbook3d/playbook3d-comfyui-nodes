@@ -55,7 +55,7 @@ class DepthRenderPass:
             headers = {"Authorization": f"Bearer {user_token}"}
             url = f"{base_url}/upload-assets/get-download-urls"
             if run_id:
-                url += f"?run_id={run_id}"
+                url = f"{url}/{run_id}"
 
             depth_request = requests.get(url, headers=headers)
             if depth_request.status_code == 200:
