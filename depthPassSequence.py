@@ -26,6 +26,7 @@ class DepthRenderPassSequence:
 
     @classmethod
     def IS_CHANGED(cls, image):
+        # always update
         m = hashlib.sha256()
         m.update(str(time.time()).encode("utf-8"))
         return m.digest().hex()
@@ -37,25 +38,38 @@ class DepthRenderPassSequence:
     CATEGORY = "Playbook 3D"
 
     def parse_depth_sequence(self, api_key, run_id=None):
+        """
+        Fetches a zip file containing depth pass frames for a given run_id.
+        Unzips the images and returns them as a batched tensor.
+        """
         base_url = "https://accounts.playbook3d.com"
-        user_token = None
 
-        # Authenticate using the API key
-        jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
+        # 1) Check if api_key is valid
+        if not api_key or not api_key.strip():
+            raise ValueError("No api_key provided.")
+
+        # 2) Retrieve user token
+        user_token = None
         try:
+            jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
             if jwt_request is not None and jwt_request.status_code == 200:
-                user_token = jwt_request.json()["access_token"]
+                user_token = jwt_request.json().get("access_token", None)
+                if not user_token:
+                    raise ValueError("Could not retrieve user token.")
             else:
                 raise ValueError("API Key not found or incorrect.")
         except Exception as e:
-            print(f"Error with node: {e}")
+            print(f"Error retrieving token: {e}")
             raise ValueError("API Key not found or incorrect.")
 
+        # 3) Check if run_id is valid
+        if not run_id or not run_id.strip():
+            raise ValueError("No run_id provided.")
+
+        # 4) Construct the endpoint using run_id
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            url = f"{base_url}/upload-assets/get-download-urls"
-            if run_id:
-                url = f"{url}/{run_id}"
+            url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
 
             depth_request = requests.get(url, headers=headers)
             if depth_request.status_code == 200:
@@ -63,7 +77,7 @@ class DepthRenderPassSequence:
                 if not depth_url:
                     raise ValueError("No depth zip found for the provided parameters.")
 
-                # Download the zip file
+                # 5) Download the zip file
                 depth_response = requests.get(depth_url)
                 if depth_response.status_code != 200:
                     raise ValueError("Failed to download the depth zip file.")
@@ -72,10 +86,11 @@ class DepthRenderPassSequence:
 
                 # Extract images from the zip file
                 images_batch = self.extract_images_from_zip(zip_content)
-
                 return (images_batch,)
             else:
-                raise ValueError("Failed to retrieve depth URL.")
+                raise ValueError(
+                    f"Failed to retrieve depth URL. Status code: {depth_request.status_code}"
+                )
         except Exception as e:
             print(f"Error processing depth sequence: {e}")
             raise ValueError("Depth pass not uploaded or processing error occurred.")
@@ -105,6 +120,7 @@ class DepthRenderPassSequence:
             return images_batch
         else:
             raise ValueError("No images found in the zip file.")
+
 
 NODE_CLASS_MAPPINGS = {
     "Depth Pass Sequence": DepthRenderPassSequence
