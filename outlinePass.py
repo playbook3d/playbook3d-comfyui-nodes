@@ -60,15 +60,14 @@ class OutlineRenderPass:
             print(f"Error retrieving token: {e}")
             return [default_value]
 
-        # 3) Check run_id
-        if not run_id or not run_id.strip():
-            print("No run_id provided. Returning default image.")
-            return [default_value]
 
-        # 4) Construct the request URL with run_id
-        url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
+        # 3) Construct the request URL with run_id
+        if run_id:
+            url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
+        else:
+            url = f"{base_url}/upload-assets/get-download-urls"
 
-        # 5) Fetch the outline pass
+        # 4) Fetch the outline pass
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
             outline_request = requests.get(url, headers=headers)
