@@ -84,13 +84,12 @@ class MaskRenderPass:
             print(f"Error retrieving token: {e}")
             return [default_value] * 9
 
-        # 3) Check run_id
-        if not run_id or not run_id.strip():
-            print("No run_id provided. Returning default masks.")
-            return [default_value] * 9
 
-        # 4) Construct the URL with run_id
-        url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
+        # 3) Construct the URL with run_id
+        if run_id:
+            url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
+        else:
+            url = f"{base_url}/upload-assets/get-download-urls"
 
         # 5) Request the mask pass
         try:

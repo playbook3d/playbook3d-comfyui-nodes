@@ -62,14 +62,14 @@ class DepthRenderPassSequence:
             print(f"Error retrieving token: {e}")
             raise ValueError("API Key not found or incorrect.")
 
-        # 3) Check if run_id is valid
-        if not run_id or not run_id.strip():
-            raise ValueError("No run_id provided.")
 
-        # 4) Construct the endpoint using run_id
+        # 3) Construct the endpoint using run_id
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
+            if run_id:
+                url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
+            else:
+                url = f"{base_url}/upload-assets/get-download-urls"
 
             depth_request = requests.get(url, headers=headers)
             if depth_request.status_code == 200:

@@ -62,15 +62,13 @@ class DepthRenderPass:
             print(f"Error retrieving token: {e}")
             return [default_value]
 
-        # 3) Check run_id
-        if not run_id or not run_id.strip():
-            print("No run_id provided. Returning default image.")
-            return [default_value]
-
-        # 4) Construct the endpoint using run_id and fetch the Depth pass
+        # 3) Construct the endpoint using run_id and fetch the Depth pass
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
+            if run_id:
+                url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
+            else:
+                url = f"{base_url}/upload-assets/get-download-urls"
 
             depth_request = requests.get(url, headers=headers)
             if depth_request.status_code == 200:
