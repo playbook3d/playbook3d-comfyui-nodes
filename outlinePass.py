@@ -33,31 +33,46 @@ class OutlineRenderPass:
     RETURN_NAMES = ("Image",)
 
     FUNCTION = "parse_outline"
-
     OUTPUT_NODE = {False}
-
     CATEGORY = "Playbook 3D"
 
     def parse_outline(self, api_key, run_id=None, default_value=None):
+        """
+        Fetches the outline pass for the specified run_id.
+        """
         base_url = "https://accounts.playbook3d.com"
-        user_token = None
 
-        jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
-
-        try:
-            if jwt_request is not None:
-                user_token = jwt_request.json()["access_token"]
-        except Exception as e:
-            print(f"Error with node: {e}")
+        # 1) Check API key
+        if not api_key or not api_key.strip():
+            print("No api_key provided. Returning default image.")
             return [default_value]
 
+        # 2) Retrieve user token
+        user_token = None
+        try:
+            jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
+            if jwt_request is not None:
+                user_token = jwt_request.json().get("access_token", None)
+            if not user_token:
+                print("Could not retrieve user_token. Returning default image.")
+                return [default_value]
+        except Exception as e:
+            print(f"Error retrieving token: {e}")
+            return [default_value]
+
+        # 3) Check run_id
+        if not run_id or not run_id.strip():
+            print("No run_id provided. Returning default image.")
+            return [default_value]
+
+        # 4) Construct the request URL with run_id
+        url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
+
+        # 5) Fetch the outline pass
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            url = f"{base_url}/upload-assets/get-download-urls"
-            if run_id:
-                url = f"{url}/{run_id}"
-
             outline_request = requests.get(url, headers=headers)
+
             if outline_request.status_code == 200:
                 outline_url = outline_request.json().get("outline")
                 if outline_url:
@@ -69,12 +84,16 @@ class OutlineRenderPass:
                     image = torch.from_numpy(image)[None,]
                     return [image]
                 else:
+                    print("No 'outline' key found in the JSON response. Returning default image.")
                     return [default_value]
             else:
+                print(f"Outline request returned status code {outline_request.status_code}")
                 return [default_value]
+
         except Exception as e:
             print(f"Error retrieving outline pass: {e}")
             return [default_value]
+
 
 NODE_CLASS_MAPPINGS = {
     "Playbook Outline": OutlineRenderPass

@@ -24,7 +24,7 @@ class DepthRenderPass:
 
     @classmethod
     def IS_CHANGED(cls, image):
-        # always update
+        # Always update
         m = hashlib.sha256()
         m.update(str(time.time()).encode("utf-8"))
         return m.digest().hex()
@@ -33,29 +33,44 @@ class DepthRenderPass:
     RETURN_NAMES = ("Image",)
 
     FUNCTION = "parse_depth"
-
     OUTPUT_NODE = {False}
-
     CATEGORY = "Playbook 3D"
 
     def parse_depth(self, api_key, run_id=None, default_value=None):
+        """
+        This method fetches the user's access_token from the
+        Playbook3D token endpoint, checks run_id, and then 
+        makes a request to fetch the Depth image.
+        """
         base_url = "https://accounts.playbook3d.com"
-        user_token = None
 
-        jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
-
-        try:
-            if jwt_request is not None:
-                user_token = jwt_request.json()["access_token"]
-        except Exception as e:
-            print(f"Error with node: {e}")
+        # 1) Ensure API key is provided
+        if not api_key or not api_key.strip():
+            print("No api_key provided. Returning default image.")
             return [default_value]
 
+        # 2) Get user_token from the token service
+        user_token = None
+        try:
+            jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
+            if jwt_request is not None:
+                user_token = jwt_request.json().get("access_token", None)
+            if not user_token:
+                print("Could not retrieve user_token. Returning default image.")
+                return [default_value]
+        except Exception as e:
+            print(f"Error retrieving token: {e}")
+            return [default_value]
+
+        # 3) Check run_id
+        if not run_id or not run_id.strip():
+            print("No run_id provided. Returning default image.")
+            return [default_value]
+
+        # 4) Construct the endpoint using run_id and fetch the Depth pass
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            url = f"{base_url}/upload-assets/get-download-urls"
-            if run_id:
-                url = f"{url}/{run_id}"
+            url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
 
             depth_request = requests.get(url, headers=headers)
             if depth_request.status_code == 200:
@@ -69,12 +84,16 @@ class DepthRenderPass:
                     image = torch.from_numpy(image)[None,]
                     return [image]
                 else:
+                    print("No 'depth' key found in the JSON response. Returning default image.")
                     return [default_value]
             else:
+                print(f"Depth request returned status code {depth_request.status_code}")
                 return [default_value]
+
         except Exception as e:
             print(f"Error retrieving depth pass: {e}")
             return [default_value]
+
 
 NODE_CLASS_MAPPINGS = {
     "Playbook Depth": DepthRenderPass
