@@ -14,11 +14,11 @@ class MaskRenderPass:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "api_key": ("STRING", { "multiline": False }),
-                "blur_size": ("FLOAT", { "default": 0.0, "min": 0.0, "max": 50.0 })
+                "api_key": ("STRING", {"multiline": False}),
+                "blur_size": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 50.0})
             },
             "optional": {
-                "run_id": ("STRING", { "multiline": False }),
+                "run_id": ("STRING", {"multiline": False}),
                 "default_value": ("IMAGE",),
             }
         }
@@ -59,25 +59,44 @@ class MaskRenderPass:
     CATEGORY = "Playbook 3D"
 
     def parse_mask(self, api_key, blur_size, run_id=None, default_value=None):
+        """
+        Fetches the mask pass for the specified run_id, applies
+        optional Gaussian blur, and returns the composite + 
+        individual color-based masks.
+        """
         base_url = "https://accounts.playbook3d.com"
+
+        # 1) Check API key
+        if not api_key or not api_key.strip():
+            print("No api_key provided. Returning default masks.")
+            return [default_value] * 9
+
+        # 2) Retrieve user token
         user_token = None
-
-        jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
-
         try:
+            jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
             if jwt_request is not None:
-                user_token = jwt_request.json()["access_token"]
+                user_token = jwt_request.json().get("access_token", None)
+            if not user_token:
+                print("Could not retrieve user_token. Returning default masks.")
+                return [default_value] * 9
         except Exception as e:
-            print(f"Error with node: {e}")
-            raise ValueError("API Key not found/Incorrect")
+            print(f"Error retrieving token: {e}")
+            return [default_value] * 9
 
+        # 3) Check run_id
+        if not run_id or not run_id.strip():
+            print("No run_id provided. Returning default masks.")
+            return [default_value] * 9
+
+        # 4) Construct the URL with run_id
+        url = f"{base_url}/upload-assets/get-download-urls/{run_id}"
+
+        # 5) Request the mask pass
         try:
             headers = {"Authorization": f"Bearer {user_token}"}
-            url = f"{base_url}/upload-assets/get-download-urls"
-            if run_id:
-                url += f"?run_id={run_id}"
-
             mask_request = requests.get(url, headers=headers)
+
             if mask_request.status_code == 200:
                 mask_url = mask_request.json().get("mask")
                 if not mask_url:
@@ -88,9 +107,13 @@ class MaskRenderPass:
                 image = ImageOps.exif_transpose(image)
                 image = image.convert("RGB")
 
+                # Convert to tensor
                 composite_mask = np.array(image)
-                composite_mask_tensor = torch.from_numpy(composite_mask.astype(np.float32) / 255.0)[None,]
+                composite_mask_tensor = torch.from_numpy(
+                    composite_mask.astype(np.float32) / 255.0
+                )[None,]
 
+                # Define the 8 known color codes in the mask
                 color_codes = [
                     "#ffe906",
                     "#0589d6",
@@ -102,10 +125,11 @@ class MaskRenderPass:
                     "#e6000c"
                 ]
                 color_tuples = [
-                    tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
-                    for color in color_codes
+                    tuple(int(c.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+                    for c in color_codes
                 ]
 
+                # Generate individual masks
                 individual_masks = []
                 for color in color_tuples:
                     mask_array = ((composite_mask == np.array(color)).all(axis=2)).astype(np.uint8) * 255
@@ -118,13 +142,16 @@ class MaskRenderPass:
                     )[None,]
                     individual_masks.append(mask_tensor)
 
-                # Ensure all masks have the same shape
+                # Ensure all masks have the same shape if needed
                 for i in range(len(individual_masks)):
                     if individual_masks[i].shape != individual_masks[0].shape:
                         individual_masks[i] = torch.nn.functional.interpolate(
-                            individual_masks[i], size=individual_masks[0].shape[2:], mode='nearest'
+                            individual_masks[i],
+                            size=individual_masks[0].shape[2:],
+                            mode='nearest'
                         )
 
+                # Return composite + 8 masks
                 return [
                     composite_mask_tensor,
                     individual_masks[0],
@@ -136,17 +163,14 @@ class MaskRenderPass:
                     individual_masks[6],
                     individual_masks[7]
                 ]
-
             else:
-                # If no run_id was given or the request failed, fallback to default
-                if run_id:
-                    raise ValueError(f"Failed to retrieve mask URL for run_id {run_id}.")
-                return [default_value] * 9  # Return default for all outputs in case of no data
+                print(f"Mask request returned status code {mask_request.status_code}")
+                return [default_value] * 9
+
         except Exception as e:
             print(f"Error while processing masks: {e}")
-            if run_id:
-                raise ValueError("Mask pass not uploaded or processing error occurred.")
             return [default_value] * 9
+
 
 NODE_CLASS_MAPPINGS = {
     "Playbook Mask": MaskRenderPass
