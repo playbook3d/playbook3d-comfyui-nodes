@@ -13,8 +13,8 @@ class PlaybookFloat:
             "required": {
                 "id": ("STRING", {"multiline": False, "default": "Node ID"}),
                 "label": ("STRING", {"multiline": False, "default": "Node Label"}),
-                "min": ("FLOAT", {"multiline": False, "default": 0, "display": "number"}),
-                "max": ("FLOAT", {"multiline": False, "default": 1.0, "display": "number"}),
+                "min": ("FLOAT", {"multiline": False, "default": 0, "display": "number", "step": 0.01}),
+                "max": ("FLOAT", {"multiline": False, "default": 1.0, "display": "number", "step": 0.01}),
             },
             "optional": {
                 "default_value": ("FLOAT",
@@ -24,7 +24,7 @@ class PlaybookFloat:
                         "min": -2147483647,
                         "max": 2147483647,
                         "default": 0,
-                        "step": 0.1
+                        "step": 0.01
                     },
                 ),
             }
