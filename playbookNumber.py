@@ -45,9 +45,9 @@ class PlaybookNumber:
 
     def parse_number(self, id, min, max, label, default_value = None):
         if not id or (isinstance(id, str) and not id.strip().isdigit()):
-            return [np.clip(default_value, min, max)]
+            return [int(np.clip(default_value, min, max))]
         id_int = int(id)
-        return [np.clip(id_int, min, max)]
+        return [int(np.clip(id_int, min, max))]
 
 
 NODE_CLASS_MAPPINGS = { "Playbook Number": PlaybookNumber }

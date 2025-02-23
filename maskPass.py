@@ -75,8 +75,10 @@ class MaskRenderPass:
         user_token = None
         try:
             jwt_request = requests.get(f"{base_url}/token-wrapper/get-tokens/{api_key}")
+            print("jwt request: ", jwt_request)
             if jwt_request is not None:
                 user_token = jwt_request.json().get("access_token", None)
+                print("user token: ", user_token)
             if not user_token:
                 print("Could not retrieve user_token. Returning default masks.")
                 return [default_value] * 9
