@@ -16,6 +16,7 @@ from .playbookVideo import PlaybookVideo
 from .playbookAspectRatioSelect import PlaybookAspectRatioSelect
 from .playbookLoraSelect import PlaybookLoRASelection
 from .playbookSeed import PlaybookSeed
+from .playbookMaskInput import PlaybookMaskInput
 
 NODE_CLASS_MAPPINGS = {
     "Playbook Depth": DepthRenderPass,
@@ -36,6 +37,7 @@ NODE_CLASS_MAPPINGS = {
     "Playbook Aspect Ratio Select": PlaybookAspectRatioSelect,
     "Playbook LoRA Select": PlaybookLoRASelection,
     "Playbook Seed": PlaybookSeed,
+    "Playbook Mask Input": PlaybookMaskInput,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -57,6 +59,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Playbook Aspect Ratio Select": "Playbook Aspect Ratio Select (External)",
     "Playbook LoRA Select": "Playbook LoRA Select (External)",
     "Playbook Seed": "Playbook Seed",
+    "Playbook Mask Input": "Playbook Mask (Dynamic Input)",
 }
 
 
